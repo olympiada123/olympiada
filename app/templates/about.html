@@ -4,145 +4,108 @@
 
 {% block content %}
 <div class="container">
-    <div class="page-header">
-        <h1 class="page-title">О платформе</h1>
-        <p class="page-subtitle">Узнайте больше о нашей системе проведения онлайн-олимпиад</p>
-    </div>
+    <div class="about-page">
+        <h1 class="about-page-title">О платформе</h1>
 
-    <section class="about-section">
-        <div class="about-content">
-            <h2 class="section-heading">Наша миссия</h2>
-            <p class="about-text">
-                Платформа для проведения онлайн-этапа олимпиады создана для обеспечения удобного и справедливого процесса оценки знаний студентов. Мы стремимся предоставить современные инструменты для организации образовательных соревнований с использованием передовых технологий.
-            </p>
-        </div>
-    </section>
+        <section class="about-section">
+            <div class="mission-block">
+                <div class="mission-content">
+                    <div class="mission-icon">🎓</div>
+                    <h2 class="mission-heading">Наша миссия</h2>
+                    <p class="mission-text">Платформа для проведения онлайн-этапа олимпиады создана для обеспечения удобного и справедливого процесса оценки знаний студентов. Мы стремимся предоставить современные инструменты для организации образовательных соревнований.</p>
+                </div>
+                <div class="mission-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Доступность платформы</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">∞</div>
+                        <div class="stat-label">Количество участников</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">0</div>
+                        <div class="stat-label">Время ожидания результатов</div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    <section class="about-section">
-        <div class="about-content">
+        <section class="about-section">
             <h2 class="section-heading">Основные возможности</h2>
-            <div class="features-list">
-                <div class="feature-item" data-animate="fade-up">
-                    <div class="feature-icon-wrapper">
-                        <span class="feature-icon">📋</span>
-                    </div>
-                    <div class="feature-content">
-                        <h3>Регистрация и управление</h3>
-                        <p>Простая система регистрации студентов на олимпиады с возможностью выбора нескольких предметов. Администраторы могут управлять процессом регистрации и одобрения участников.</p>
-                    </div>
+            <div class="features-grid">
+                <div class="feature-card-compact" data-animate="fade-up">
+                    <span class="feature-icon-compact">📋</span>
+                    <h3>Регистрация</h3>
+                    <p>Простая регистрация на олимпиады с выбором предметов</p>
                 </div>
-                <div class="feature-item" data-animate="fade-up">
-                    <div class="feature-icon-wrapper">
-                        <span class="feature-icon">✍️</span>
-                    </div>
-                    <div class="feature-content">
-                        <h3>Прохождение тестов</h3>
-                        <p>Интуитивный интерфейс для прохождения тестов с поддержкой различных типов вопросов. Система отслеживает время, позволяет делать паузы и сохраняет прогресс.</p>
-                    </div>
+                <div class="feature-card-compact" data-animate="fade-up">
+                    <span class="feature-icon-compact">✍️</span>
+                    <h3>Прохождение тестов</h3>
+                    <p>Удобный интерфейс для решения заданий</p>
                 </div>
-                <div class="feature-item" data-animate="fade-up">
-                    <div class="feature-icon-wrapper">
-                        <span class="feature-icon">📊</span>
-                    </div>
-                    <div class="feature-content">
-                        <h3>Автоматическая оценка</h3>
-                        <p>Мгновенный подсчет баллов с использованием гибкой системы весов. Поддержка частичных баллов, штрафов и бонусов для более точной оценки знаний.</p>
-                    </div>
+                <div class="feature-card-compact" data-animate="fade-up">
+                    <span class="feature-icon-compact">📊</span>
+                    <h3>Результаты</h3>
+                    <p>Мгновенный подсчет баллов и просмотр статистики</p>
                 </div>
-                <div class="feature-item" data-animate="fade-up">
-                    <div class="feature-icon-wrapper">
-                        <span class="feature-icon">🏆</span>
-                    </div>
-                    <div class="feature-content">
-                        <h3>Рейтинг и статистика</h3>
-                        <p>Прозрачная система рейтинга участников с детальной статистикой. Возможность сравнения результатов и анализа успеваемости.</p>
-                    </div>
-                </div>
-                <div class="feature-item" data-animate="fade-up">
-                    <div class="feature-icon-wrapper">
-                        <span class="feature-icon">🔒</span>
-                    </div>
-                    <div class="feature-content">
-                        <h3>Безопасность</h3>
-                        <p>Система мониторинга подозрительной активности, отслеживание IP-адресов и отпечатков браузера для обеспечения честности проведения олимпиад.</p>
-                    </div>
-                </div>
-                <div class="feature-item" data-animate="fade-up">
-                    <div class="feature-icon-wrapper">
-                        <span class="feature-icon">⚙️</span>
-                    </div>
-                    <div class="feature-content">
-                        <h3>Гибкие настройки</h3>
-                        <p>Настройка времени прохождения, количества попыток, порядка вопросов и других параметров для каждой олимпиады индивидуально.</p>
-                    </div>
+                <div class="feature-card-compact" data-animate="fade-up">
+                    <span class="feature-icon-compact">🏆</span>
+                    <h3>Рейтинг</h3>
+                    <p>Сравнение результатов с другими участниками</p>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section class="about-section">
-        <div class="about-content">
-            <h2 class="section-heading">Технологии</h2>
-            <div class="tech-grid">
-                <div class="tech-card" data-animate="scale">
-                    <h3>Django</h3>
-                    <p>Мощный веб-фреймворк для создания надежных и масштабируемых приложений</p>
+        <section class="about-section">
+            <div class="steps-grid">
+                <div class="about-card">
+                    <h2 class="card-heading">С чего начать?</h2>
+                    <div class="steps-list">
+                        <div class="step-item" data-animate="slide-right">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h3>Зарегистрируйтесь</h3>
+                                <p>Создайте аккаунт на платформе, указав свои данные и студенческий билет</p>
+                            </div>
+                        </div>
+                        <div class="step-item" data-animate="slide-right">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h3>Выберите олимпиаду</h3>
+                                <p>Просмотрите доступные олимпиады и выберите интересующие вас предметы</p>
+                            </div>
+                        </div>
+                        <div class="step-item" data-animate="slide-right">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h3>Пройдите тест</h3>
+                                <p>В назначенное время войдите в систему и выполните задания олимпиады</p>
+                            </div>
+                        </div>
+                        <div class="step-item" data-animate="slide-right">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h3>Получите результаты</h3>
+                                <p>После завершения олимпиады ознакомьтесь с результатами и рейтингом</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="tech-card" data-animate="scale">
-                    <h3>MySQL</h3>
-                    <p>Производительная система управления базами данных для хранения информации</p>
-                </div>
-                <div class="tech-card" data-animate="scale">
-                    <h3>Responsive Design</h3>
-                    <p>Адаптивный дизайн для комфортной работы на любых устройствах</p>
-                </div>
-                <div class="tech-card" data-animate="scale">
-                    <h3>Modern JavaScript</h3>
-                    <p>Интерактивные элементы и анимации для улучшения пользовательского опыта</p>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <section class="about-section">
-        <div class="about-content">
-            <h2 class="section-heading">Для кого создана платформа</h2>
-            <div class="audience-cards">
-                <div class="audience-card" data-animate="slide-right">
-                    <h3>Студенты</h3>
-                    <p>Участвуйте в олимпиадах, проверяйте свои знания и соревнуйтесь с другими участниками</p>
-                </div>
-                <div class="audience-card" data-animate="slide-left">
-                    <h3>Преподаватели</h3>
-                    <p>Организуйте олимпиады, создавайте вопросы и отслеживайте результаты студентов</p>
-                </div>
-                <div class="audience-card" data-animate="slide-right">
-                    <h3>Администраторы</h3>
-                    <p>Управляйте платформой, настраивайте олимпиады и контролируйте процесс проведения</p>
+                <div class="about-card">
+                    <h2 class="card-heading">Полезные советы</h2>
+                    <ul class="tips-list">
+                        <li data-animate="fade-up">Заранее проверьте технические требования и стабильность интернет-соединения</li>
+                        <li data-animate="fade-up">Внимательно прочитайте инструкции перед началом тестирования</li>
+                        <li data-animate="fade-up">Используйте функцию паузы, если вам нужно сделать перерыв</li>
+                        <li data-animate="fade-up">Следите за оставшимся временем, но не спешите - качество важнее скорости</li>
+                        <li data-animate="fade-up">Перед отправкой ответов проверьте все выбранные варианты</li>
+                    </ul>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <section class="about-section">
-        <div class="about-content">
-            <h2 class="section-heading">Контакты</h2>
-            <div class="contact-info">
-                <div class="contact-item">
-                    <span class="contact-label">Учреждение:</span>
-                    <span class="contact-value">Московский университет имени С.Ю. Витте</span>
-                </div>
-                <div class="contact-item">
-                    <span class="contact-label">Email:</span>
-                    <span class="contact-value">olympiada@example.com</span>
-                </div>
-                <div class="contact-item">
-                    <span class="contact-label">Телефон:</span>
-                    <span class="contact-value">+7 (495) 123-45-67</span>
-                </div>
-            </div>
-        </div>
-    </section>
+        </section>
+    </div>
 </div>
 {% endblock %}
 

@@ -13,70 +13,58 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, observerOptions);
 
-    const animatedElements = document.querySelectorAll('[data-animate]');
-    animatedElements.forEach(function(element) {
-        observer.observe(element);
-    });
-
-    const featureItems = document.querySelectorAll('.feature-item');
-    featureItems.forEach(function(item, index) {
+    const featureCards = document.querySelectorAll('.feature-card-compact');
+    featureCards.forEach(function(item, index) {
+        item.style.transition = 'all 0.5s ease-out';
         item.style.transitionDelay = (index * 0.1) + 's';
         observer.observe(item);
     });
 
-    const techCards = document.querySelectorAll('.tech-card');
-    techCards.forEach(function(card, index) {
-        card.style.transitionDelay = (index * 0.1) + 's';
-        observer.observe(card);
+    const stepItems = document.querySelectorAll('.step-item');
+    stepItems.forEach(function(item, index) {
+        item.style.transition = 'all 0.5s ease-out';
+        item.style.transitionDelay = (index * 0.15) + 's';
+        observer.observe(item);
     });
 
-    const audienceCards = document.querySelectorAll('.audience-card');
-    audienceCards.forEach(function(card, index) {
-        card.style.transitionDelay = (index * 0.15) + 's';
-        observer.observe(card);
-    });
-
-    const contactItems = document.querySelectorAll('.contact-item');
-    contactItems.forEach(function(item, index) {
-        item.style.opacity = '0';
-        item.style.transform = 'translateY(10px)';
+    const tipsItems = document.querySelectorAll('.tips-list li');
+    tipsItems.forEach(function(item, index) {
         item.style.transition = 'all 0.4s ease-out';
-        
-        setTimeout(function() {
-            item.style.opacity = '1';
-            item.style.transform = 'translateY(0)';
-        }, 300 + (index * 100));
+        item.style.transitionDelay = (index * 0.1) + 's';
+        observer.observe(item);
     });
 
-    const sectionHeadings = document.querySelectorAll('.section-heading');
-    sectionHeadings.forEach(function(heading) {
-        heading.addEventListener('mouseenter', function() {
-            this.style.transform = 'scale(1.05)';
+    const aboutCards = document.querySelectorAll('.about-card');
+    aboutCards.forEach(function(card) {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-4px)';
         });
         
-        heading.addEventListener('mouseleave', function() {
-            this.style.transform = 'scale(1)';
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
         });
     });
 
-    const featureIcons = document.querySelectorAll('.feature-icon');
+    const featureIcons = document.querySelectorAll('.feature-icon-compact');
     featureIcons.forEach(function(icon) {
+        icon.style.transition = 'all 0.3s ease-out';
         icon.addEventListener('mouseenter', function() {
-            this.style.transform = 'rotate(10deg) scale(1.1)';
+            this.style.transform = 'scale(1.2) rotate(5deg)';
         });
         
         icon.addEventListener('mouseleave', function() {
-            this.style.transform = 'rotate(0) scale(1)';
+            this.style.transform = 'scale(1) rotate(0)';
         });
     });
 
-    window.addEventListener('scroll', function() {
-        const scrolled = window.pageYOffset;
-        const parallaxElements = document.querySelectorAll('.page-header');
+    const stepNumbers = document.querySelectorAll('.step-number');
+    stepNumbers.forEach(function(number) {
+        number.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.1) rotate(5deg)';
+        });
         
-        parallaxElements.forEach(function(element) {
-            const speed = 0.5;
-            element.style.transform = 'translateY(' + (scrolled * speed) + 'px)';
+        number.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1) rotate(0)';
         });
     });
 });
