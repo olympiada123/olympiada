@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Олимпиада - Московский университет имени С.Ю. Витте{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="/" class="logo">
+                    <span class="logo-icon">🏆</span>
+                    <span class="logo-text">Олимпиада</span>
+                </a>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="/" class="nav-link">Главная</a>
+                <a href="/olympiads/" class="nav-link">Олимпиады</a>
+                {% if user.is_authenticated %}
+                    <a href="/profile/" class="nav-link">Профиль</a>
+                    <a href="/results/" class="nav-link">Результаты</a>
+                    <a href="/logout/" class="nav-link btn-logout">Выход</a>
+                {% else %}
+                    <a href="/login/" class="nav-link">Вход</a>
+                    <a href="/register/" class="nav-link btn-register">Регистрация</a>
+                {% endif %}
+            </div>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    {% if messages %}
+        <div class="messages-container">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} fade-in">
+                    <span class="alert-icon">
+                        {% if message.tags == 'success' %}✓
+                        {% elif message.tags == 'error' %}✕
+                        {% elif message.tags == 'warning' %}⚠
+                        {% else %}ℹ{% endif %}
+                    </span>
+                    <span class="alert-message">{{ message }}</span>
+                    <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>О платформе</h3>
+                    <p>Онлайн-платформа для проведения олимпиад</p>
+                    <p>Московский университет имени С.Ю. Витте</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Быстрые ссылки</h3>
+                    <a href="/olympiads/">Олимпиады</a>
+                    <a href="/rules/">Правила</a>
+                    <a href="/faq/">FAQ</a>
+                </div>
+                <div class="footer-section">
+                    <h3>Контакты</h3>
+                    <p>Email: olympiada@example.com</p>
+                    <p>Телефон: +7 (495) 123-45-67</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Московский университет имени С.Ю. Витте. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+
