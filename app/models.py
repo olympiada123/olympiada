@@ -9,6 +9,23 @@ class CustomUser(AbstractUser):
     Расширенная модель пользователя для студентов
     """
 
+    groups = models.ManyToManyField(
+        "auth.Group",
+        verbose_name="groups",
+        blank=True,
+        help_text="The groups this user belongs to.",
+        related_name="customuser_set",
+        related_query_name="customuser",
+    )
+    user_permissions = models.ManyToManyField(
+        "auth.Permission",
+        verbose_name="user permissions",
+        blank=True,
+        help_text="Specific permissions for this user.",
+        related_name="customuser_set",
+        related_query_name="customuser",
+    )
+
     middle_name = models.CharField(max_length=150, blank=True, verbose_name="Отчество")
     student_id = models.CharField(
         max_length=50,
@@ -327,7 +344,6 @@ class Answer(models.Model):
         "self",
         symmetrical=True,
         blank=True,
-        related_name="conflicting_answers",
         verbose_name="Конфликтует с ответами",
     )
     priority = models.PositiveIntegerField(
