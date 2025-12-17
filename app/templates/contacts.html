@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Контакты - Олимпиада{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="about-page">
+        <h1 class="about-page-title">Контакты</h1>
+
+        <section class="about-section">
+            <div class="contacts-grid">
+                <div class="about-card">
+                    <h2 class="card-heading">Адрес</h2>
+                    <div class="contact-info-block">
+                        <p class="contact-text">2-й Кожуховский проезд, д. 12, стр. 1</p>
+                        <p class="contact-text">Москва, 115432, Россия</p>
+                    </div>
+                </div>
+
+                <div class="about-card">
+                    <h2 class="card-heading">Электронная почта</h2>
+                    <div class="contact-info-block">
+                        <a href="mailto:info@muiv.ru" class="contact-link">info@muiv.ru</a>
+                    </div>
+                </div>
+
+                <div class="about-card">
+                    <h2 class="card-heading">Телефон</h2>
+                    <div class="contact-info-block">
+                        <a href="tel:+74951234567" class="contact-link">+7 (495) 123-45-67</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="about-section">
+            <div class="about-card map-card">
+                <h2 class="card-heading">Как нас найти</h2>
+                <div class="map-container">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15120.641118896838!2d37.65627018573483!3d55.71164274250781!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x414ab4caf9faf987%3A0xbfd80e63b2dea40f!2s2-Y%20Kozhukhovskiy%20Proyezd%2C%20Moskva%2C%20Russia!5e0!3m2!1sen!2saz!4v1764412880585!5m2!1sen!2saz" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade"
+                        class="google-map">
+                    </iframe>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
