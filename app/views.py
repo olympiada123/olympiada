@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from .models import ContactForm, Olympiad, Subject, CustomUser
+from .models import ContactForm, Olympiad, Subject, CustomUser, StudentRegistration
 
 
 def index(request):
@@ -251,4 +251,35 @@ def logout_view(request):
     logout(request)
     messages.success(request, 'Вы успешно вышли из системы.')
     return redirect('index')
+
+
+@login_required
+def profile_view(request):
+    """
+    Отображает страницу личного кабинета пользователя.
+    
+    Args:
+        request: HTTP запрос.
+    
+    Returns:
+        HttpResponse: Рендеринг шаблона profile.html с данными пользователя.
+    """
+    user = request.user
+    
+    if user.is_superuser:
+        role = 'Администратор'
+    elif user.is_staff:
+        role = 'Куратор'
+    else:
+        role = 'Студент'
+    
+    registrations = StudentRegistration.objects.filter(student=user).select_related('olympiad').prefetch_related('subjects', 'olympiad__subjects__subject').order_by('-registered_at')
+    
+    context = {
+        'user': user,
+        'role': role,
+        'registrations': registrations,
+    }
+    
+    return render(request, 'profile.html', context)
 

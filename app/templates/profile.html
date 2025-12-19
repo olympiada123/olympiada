@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Личный кабинет - Олимпиада{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="about-page">
+        <h1 class="about-page-title">Личный кабинет</h1>
+
+        <section class="about-section">
+            <div class="detail-section-card">
+                <h2 class="section-title">Личная информация</h2>
+                <div class="profile-info-grid">
+                    <div class="profile-info-item">
+                        <span class="profile-info-label">Имя:</span>
+                        <span class="profile-info-value">{{ user.first_name|default:"Не указано" }}</span>
+                    </div>
+                    <div class="profile-info-item">
+                        <span class="profile-info-label">Фамилия:</span>
+                        <span class="profile-info-value">{{ user.last_name|default:"Не указано" }}</span>
+                    </div>
+                    <div class="profile-info-item">
+                        <span class="profile-info-label">Роль:</span>
+                        <span class="profile-info-value profile-role profile-role-{% if role == 'Администратор' %}admin{% elif role == 'Куратор' %}curator{% else %}student{% endif %}">{{ role }}</span>
+                    </div>
+                    <div class="profile-info-item">
+                        <span class="profile-info-label">Дата регистрации:</span>
+                        <span class="profile-info-value">{{ user.created_at|date:"d.m.Y" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section-card">
+                <h2 class="section-title">Мои олимпиады</h2>
+                {% if registrations %}
+                <div class="registrations-list">
+                    {% for registration in registrations %}
+                    <div class="registration-card">
+                        <div class="registration-header">
+                            <h3 class="registration-title">
+                                <a href="{% url 'olympiad_detail' registration.olympiad.id %}" class="registration-link">
+                                    {{ registration.olympiad.name }}
+                                </a>
+                            </h3>
+                            <span class="registration-status registration-status-{{ registration.status }}">
+                                {{ registration.get_status_display }}
+                            </span>
+                        </div>
+                        <div class="registration-details">
+                            <div class="registration-detail-item">
+                                <span class="detail-icon">📅</span>
+                                <span class="detail-text">Дата регистрации: {{ registration.registered_at|date:"d.m.Y" }}</span>
+                            </div>
+                            {% if registration.subjects.all %}
+                            <div class="registration-detail-item">
+                                <span class="detail-icon">📚</span>
+                                <span class="detail-text">Предметы: {% for subject in registration.subjects.all %}{{ subject.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <p class="empty-state-text">Вы еще не зарегистрированы ни на одну олимпиаду.</p>
+                    <a href="{% url 'olympiads' %}" class="btn btn-primary">Посмотреть олимпиады</a>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
