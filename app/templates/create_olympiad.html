@@ -100,9 +100,17 @@
 
                     <div class="form-group">
                         <label class="form-label">Предметы олимпиады *</label>
-                        <div class="subjects-checkbox-group">
+                        <div class="subjects-search-wrapper">
+                            <input 
+                                type="text" 
+                                id="subject-search" 
+                                class="subjects-search-input" 
+                                placeholder="Поиск предметов..."
+                            >
+                        </div>
+                        <div class="subjects-checkbox-group" id="subjects-list">
                             {% for subject in subjects %}
-                            <div class="form-checkbox-item">
+                            <div class="form-checkbox-item" data-subject-name="{{ subject.name|lower }}">
                                 <input 
                                     type="checkbox" 
                                     name="subjects" 
@@ -128,5 +136,31 @@
         </section>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+{% load static %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('subject-search');
+    const subjectsList = document.getElementById('subjects-list');
+    
+    if (searchInput && subjectsList) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            const items = subjectsList.querySelectorAll('.form-checkbox-item');
+            
+            items.forEach(function(item) {
+                const subjectName = item.getAttribute('data-subject-name');
+                if (subjectName && subjectName.includes(searchTerm)) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+        });
+    }
+});
+</script>
 {% endblock %}
 

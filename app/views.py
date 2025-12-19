@@ -455,7 +455,23 @@ def profile_view(request):
         registrations = StudentRegistration.objects.filter(student=user).select_related('olympiad').prefetch_related('subjects', 'olympiad__subjects__subject').order_by('-registered_at')
     
     if user.is_staff and not user.is_superuser:
-        curator_olympiads = Olympiad.objects.all().order_by('-created_at')
+        curator_search = request.GET.get('curator_search', '').strip()
+        curator_status_filter = request.GET.get('curator_status_filter', 'all')
+        
+        curator_olympiads_query = Olympiad.objects.all()
+        
+        if curator_search:
+            curator_olympiads_query = curator_olympiads_query.filter(
+                models.Q(name__icontains=curator_search) |
+                models.Q(description__icontains=curator_search)
+            )
+        
+        if curator_status_filter == 'active':
+            curator_olympiads_query = curator_olympiads_query.filter(is_active=True)
+        elif curator_status_filter == 'inactive':
+            curator_olympiads_query = curator_olympiads_query.filter(is_active=False)
+        
+        curator_olympiads = curator_olympiads_query.order_by('-is_active', '-created_at')
     
     if user.is_superuser:
         search_query = request.GET.get('user_search', '').strip()
@@ -472,6 +488,12 @@ def profile_view(request):
         status_filter = request.GET.get('status_filter', '')
         contact_forms = ContactForm.objects.all().order_by('-created_at')
     
+    curator_search = None
+    curator_status_filter = None
+    if user.is_staff and not user.is_superuser:
+        curator_search = request.GET.get('curator_search', '').strip()
+        curator_status_filter = request.GET.get('curator_status_filter', 'all')
+    
     context = {
         'user': user,
         'role': role,
@@ -481,6 +503,8 @@ def profile_view(request):
         'contact_forms': contact_forms,
         'status_filter': status_filter,
         'curator_olympiads': curator_olympiads,
+        'curator_search': curator_search,
+        'curator_status_filter': curator_status_filter,
     }
     
     return render(request, 'profile.html', context)

@@ -89,30 +89,68 @@
                     <div class="curator-actions">
                         <a href="{% url 'create_olympiad' %}" class="btn btn-primary">Создать новую олимпиаду</a>
                     </div>
+                    
+                    <div class="curator-olympiads-filters" style="margin-top: 2rem;">
+                        <form method="get" class="curator-search-form">
+                            {% if request.GET.user_search %}
+                            <input type="hidden" name="user_search" value="{{ request.GET.user_search }}">
+                            {% endif %}
+                            {% if request.GET.status_filter %}
+                            <input type="hidden" name="status_filter" value="{{ request.GET.status_filter }}">
+                            {% endif %}
+                            <div class="curator-search-wrapper">
+                                <input 
+                                    type="text" 
+                                    name="curator_search" 
+                                    class="curator-search-input" 
+                                    placeholder="Поиск по названию или описанию..."
+                                    value="{{ curator_search|default:'' }}"
+                                >
+                                <button type="submit" class="curator-search-btn">Найти</button>
+                            </div>
+                            <div class="curator-filter-wrapper" style="margin-top: 1rem;">
+                                <select name="curator_status_filter" class="curator-status-filter" onchange="this.form.submit()">
+                                    <option value="all" {% if curator_status_filter == 'all' or not curator_status_filter %}selected{% endif %}>Все олимпиады</option>
+                                    <option value="active" {% if curator_status_filter == 'active' %}selected{% endif %}>Только текущие</option>
+                                    <option value="inactive" {% if curator_status_filter == 'inactive' %}selected{% endif %}>Только неактивные</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    
                     {% if curator_olympiads %}
                     <div class="curator-olympiads-list">
-                        <h3 class="section-subtitle" style="margin-top: 2rem; margin-bottom: 1rem;">Все олимпиады</h3>
-                        {% for olympiad in curator_olympiads %}
-                        <div class="curator-olympiad-item">
-                            <div class="curator-olympiad-info">
-                                <h4 class="curator-olympiad-title">
-                                    <a href="{% url 'olympiad_detail' olympiad.id %}" class="curator-olympiad-link">
-                                        {{ olympiad.name }}
-                                    </a>
-                                </h4>
-                                <div class="curator-olympiad-details">
-                                    <span class="curator-olympiad-date">Дата проведения: {{ olympiad.start_date|date:"d.m.Y" }} - {{ olympiad.end_date|date:"d.m.Y" }}</span>
-                                    <span class="curator-olympiad-registration">Регистрация: {{ olympiad.registration_start|date:"d.m.Y" }} - {{ olympiad.registration_end|date:"d.m.Y" }}</span>
+                        {% regroup curator_olympiads by is_active as olympiads_by_status %}
+                        {% for group in olympiads_by_status %}
+                            <h3 class="section-subtitle" style="margin-top: 2rem; margin-bottom: 1rem;">
+                                {% if group.grouper %}
+                                    Текущие олимпиады
+                                {% else %}
+                                    Неактивные олимпиады
+                                {% endif %}
+                            </h3>
+                            {% for olympiad in group.list %}
+                            <div class="curator-olympiad-item">
+                                <div class="curator-olympiad-info">
+                                    <h4 class="curator-olympiad-title">
+                                        <a href="{% url 'olympiad_detail' olympiad.id %}" class="curator-olympiad-link">
+                                            {{ olympiad.name }}
+                                        </a>
+                                    </h4>
+                                    <div class="curator-olympiad-details">
+                                        <span class="curator-olympiad-date">Дата проведения: {{ olympiad.start_date|date:"d.m.Y" }} - {{ olympiad.end_date|date:"d.m.Y" }}</span>
+                                        <span class="curator-olympiad-registration">Регистрация: {{ olympiad.registration_start|date:"d.m.Y" }} - {{ olympiad.registration_end|date:"d.m.Y" }}</span>
+                                    </div>
+                                </div>
+                                <div class="curator-olympiad-actions">
+                                    <a href="{% url 'edit_olympiad' olympiad.id %}" class="btn btn-secondary btn-sm">Редактировать</a>
                                 </div>
                             </div>
-                            <div class="curator-olympiad-actions">
-                                <a href="{% url 'edit_olympiad' olympiad.id %}" class="btn btn-secondary btn-sm">Редактировать</a>
-                            </div>
-                        </div>
+                            {% endfor %}
                         {% endfor %}
                     </div>
                     {% else %}
-                    <div class="empty-state">
+                    <div class="empty-state" style="margin-top: 2rem;">
                         <p class="empty-state-text">Олимпиады не найдены.</p>
                     </div>
                     {% endif %}
