@@ -88,6 +88,14 @@ def olympiads(request):
             status = 'upcoming'
             status_display = 'Скоро'
         
+        registration_status = None
+        if now < olympiad.registration_start:
+            registration_status = 'not_started'
+        elif olympiad.registration_start <= now <= olympiad.registration_end:
+            registration_status = 'open'
+        else:
+            registration_status = 'closed'
+        
         subjects_list = [olympiad_subject.subject for olympiad_subject in olympiad.subjects.filter(is_active=True)]
         subjects_names = [subject.name for subject in subjects_list]
         
@@ -95,6 +103,7 @@ def olympiads(request):
             'olympiad': olympiad,
             'status': status,
             'status_display': status_display,
+            'registration_status': registration_status,
             'subjects': subjects_list,
             'subjects_names': subjects_names,
         })

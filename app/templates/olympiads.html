@@ -114,12 +114,12 @@
                             {% endif %}
                         </div>
                         <div class="olympiad-actions">
-                            {% if item.status == 'active' %}
-                            <a href="#" class="btn btn-primary">Зарегистрироваться</a>
-                            {% elif item.status == 'upcoming' %}
-                            <a href="#" class="btn btn-primary" disabled>Регистрация скоро откроется</a>
-                            {% elif item.status == 'finished' %}
-                            <a href="#" class="btn btn-secondary">Посмотреть результаты</a>
+                            {% if item.registration_status == 'open' %}
+                            <a href="{% url 'olympiad_detail' item.olympiad.id %}" class="btn btn-primary">Зарегистрироваться</a>
+                            {% elif item.registration_status == 'not_started' %}
+                            <span class="btn btn-secondary" style="cursor: default; opacity: 0.7;">Регистрация скоро откроется</span>
+                            {% elif item.registration_status == 'closed' %}
+                            <span class="btn btn-secondary" style="cursor: default; opacity: 0.7;">Регистрация закрыта</span>
                             {% endif %}
                             <a href="{% url 'olympiad_detail' item.olympiad.id %}" class="btn btn-secondary">Подробнее</a>
                         </div>
