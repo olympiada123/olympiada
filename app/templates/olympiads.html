@@ -38,6 +38,15 @@
                         </select>
                     </div>
                     <div class="filter-group">
+                        <label for="subject-filter" class="filter-label">Предмет:</label>
+                        <select id="subject-filter" class="filter-select">
+                            <option value="all">Все предметы</option>
+                            {% for subject in subjects %}
+                            <option value="{{ subject.name|lower }}">{{ subject.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-group">
                         <label for="sort-filter" class="filter-label">Сортировка:</label>
                         <select id="sort-filter" class="filter-select">
                             <option value="date-desc">По дате (новые)</option>
@@ -50,130 +59,65 @@
                 </div>
             </div>
             <div class="olympiads-results-info">
-                <span id="results-count">Найдено: <strong>3</strong> олимпиад</span>
+                <span id="results-count">Найдено: <strong>{{ olympiads|length }}</strong> олимпиад</span>
             </div>
             <div class="olympiads-container" id="olympiads-container">
-                <div class="olympiad-card">
+                {% for item in olympiads %}
+                <div class="olympiad-card" data-subjects="{% for subject in item.subjects_names %}{{ subject|lower }}{% if not forloop.last %},{% endif %}{% endfor %}" data-start-date="{{ item.olympiad.start_date|date:'Y-m-d' }}" data-status="{{ item.status }}">
                     <div class="olympiad-header">
                         <div class="olympiad-title-section">
-                            <h2 class="olympiad-title">Всероссийская олимпиада по математике</h2>
-                            <span class="olympiad-status olympiad-status-active">Активна</span>
+                            <h2 class="olympiad-title">{{ item.olympiad.name }}</h2>
+                            <span class="olympiad-status olympiad-status-{{ item.status }}">{{ item.status_display }}</span>
                         </div>
                     </div>
                     <div class="olympiad-content">
+                        {% if item.olympiad.description %}
                         <p class="olympiad-description">
-                            Олимпиада по математике для студентов всех курсов. Проверьте свои знания в различных разделах математики: алгебра, геометрия, математический анализ и другие.
+                            {{ item.olympiad.description }}
                         </p>
+                        {% endif %}
                         <div class="olympiad-details">
                             <div class="olympiad-detail-item">
                                 <span class="detail-icon">📅</span>
                                 <div class="detail-content">
                                     <span class="detail-label">Дата проведения:</span>
-                                    <span class="detail-value">15 января 2025 - 20 января 2025</span>
+                                    <span class="detail-value">{{ item.olympiad.start_date|date:"d.m.Y" }} - {{ item.olympiad.end_date|date:"d.m.Y" }}</span>
                                 </div>
                             </div>
                             <div class="olympiad-detail-item">
                                 <span class="detail-icon">📝</span>
                                 <div class="detail-content">
                                     <span class="detail-label">Регистрация:</span>
-                                    <span class="detail-value">1 января 2025 - 14 января 2025</span>
+                                    <span class="detail-value">{{ item.olympiad.registration_start|date:"d.m.Y" }} - {{ item.olympiad.registration_end|date:"d.m.Y" }}</span>
                                 </div>
                             </div>
+                            {% if item.subjects %}
                             <div class="olympiad-detail-item">
                                 <span class="detail-icon">📚</span>
                                 <div class="detail-content">
                                     <span class="detail-label">Предметы:</span>
-                                    <span class="detail-value">Математика, Алгебра, Геометрия</span>
+                                    <span class="detail-value">{% for subject in item.subjects %}{{ subject.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</span>
                                 </div>
                             </div>
+                            {% endif %}
                         </div>
                         <div class="olympiad-actions">
+                            {% if item.status == 'active' %}
                             <a href="#" class="btn btn-primary">Зарегистрироваться</a>
-                            <a href="#" class="btn btn-secondary">Подробнее</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="olympiad-card">
-                    <div class="olympiad-header">
-                        <div class="olympiad-title-section">
-                            <h2 class="olympiad-title">Олимпиада по информатике</h2>
-                            <span class="olympiad-status olympiad-status-upcoming">Скоро</span>
-                        </div>
-                    </div>
-                    <div class="olympiad-content">
-                        <p class="olympiad-description">
-                            Соревнование по программированию и информатике. Решайте алгоритмические задачи, демонстрируйте навыки программирования и логического мышления.
-                        </p>
-                        <div class="olympiad-details">
-                            <div class="olympiad-detail-item">
-                                <span class="detail-icon">📅</span>
-                                <div class="detail-content">
-                                    <span class="detail-label">Дата проведения:</span>
-                                    <span class="detail-value">1 февраля 2025 - 5 февраля 2025</span>
-                                </div>
-                            </div>
-                            <div class="olympiad-detail-item">
-                                <span class="detail-icon">📝</span>
-                                <div class="detail-content">
-                                    <span class="detail-label">Регистрация:</span>
-                                    <span class="detail-value">15 января 2025 - 31 января 2025</span>
-                                </div>
-                            </div>
-                            <div class="olympiad-detail-item">
-                                <span class="detail-icon">📚</span>
-                                <div class="detail-content">
-                                    <span class="detail-label">Предметы:</span>
-                                    <span class="detail-value">Информатика, Программирование</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="olympiad-actions">
+                            {% elif item.status == 'upcoming' %}
                             <a href="#" class="btn btn-primary" disabled>Регистрация скоро откроется</a>
+                            {% elif item.status == 'finished' %}
+                            <a href="#" class="btn btn-secondary">Посмотреть результаты</a>
+                            {% endif %}
                             <a href="#" class="btn btn-secondary">Подробнее</a>
                         </div>
                     </div>
                 </div>
-
-                <div class="olympiad-card">
-                    <div class="olympiad-header">
-                        <div class="olympiad-title-section">
-                            <h2 class="olympiad-title">Олимпиада по физике</h2>
-                            <span class="olympiad-status olympiad-status-finished">Завершена</span>
-                        </div>
-                    </div>
-                    <div class="olympiad-content">
-                        <p class="olympiad-description">
-                            Проверьте свои знания в области физики: механика, термодинамика, оптика, электромагнетизм и другие разделы.
-                        </p>
-                        <div class="olympiad-details">
-                            <div class="olympiad-detail-item">
-                                <span class="detail-icon">📅</span>
-                                <div class="detail-content">
-                                    <span class="detail-label">Дата проведения:</span>
-                                    <span class="detail-value">1 декабря 2024 - 10 декабря 2024</span>
-                                </div>
-                            </div>
-                            <div class="olympiad-detail-item">
-                                <span class="detail-icon">📝</span>
-                                <div class="detail-content">
-                                    <span class="detail-label">Регистрация:</span>
-                                    <span class="detail-value">15 ноября 2024 - 30 ноября 2024</span>
-                                </div>
-                            </div>
-                            <div class="olympiad-detail-item">
-                                <span class="detail-icon">📚</span>
-                                <div class="detail-content">
-                                    <span class="detail-label">Предметы:</span>
-                                    <span class="detail-value">Физика, Механика, Электродинамика</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="olympiad-actions">
-                            <a href="#" class="btn btn-secondary">Посмотреть результаты</a>
-                        </div>
-                    </div>
+                {% empty %}
+                <div class="olympiads-empty">
+                    <p>Олимпиады не найдены</p>
                 </div>
+                {% endfor %}
             </div>
             <div class="pagination-container" id="pagination-container">
                 <div class="pagination" id="pagination">

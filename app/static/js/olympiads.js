@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('olympiad-search');
     const statusFilter = document.getElementById('status-filter');
+    const subjectFilter = document.getElementById('subject-filter');
     const sortFilter = document.getElementById('sort-filter');
     const resetBtn = document.getElementById('reset-filters');
     const container = document.getElementById('olympiads-container');
@@ -12,8 +13,16 @@ document.addEventListener('DOMContentLoaded', function() {
     let allCards = Array.from(container.querySelectorAll('.olympiad-card'));
     let filteredCards = [...allCards];
     
-    // Функция для получения статуса карточки
+    /**
+     * Определяет статус олимпиады на основе CSS классов карточки.
+     * @param {HTMLElement} card - Элемент карточки олимпиады.
+     * @returns {string} Статус олимпиады: 'active', 'upcoming', 'finished' или пустая строка.
+     */
     function getCardStatus(card) {
+        const statusAttr = card.getAttribute('data-status');
+        if (statusAttr) {
+            return statusAttr;
+        }
         const statusElement = card.querySelector('.olympiad-status');
         if (!statusElement) return '';
         
@@ -27,17 +36,37 @@ document.addEventListener('DOMContentLoaded', function() {
         return '';
     }
     
-    // Функция для получения текста карточки (название + описание)
+    /**
+     * Извлекает текст из карточки для поиска (название + описание).
+     * @param {HTMLElement} card - Элемент карточки олимпиады.
+     * @returns {string} Объединенный текст в нижнем регистре.
+     */
     function getCardText(card) {
         const title = card.querySelector('.olympiad-title')?.textContent || '';
         const description = card.querySelector('.olympiad-description')?.textContent || '';
         return (title + ' ' + description).toLowerCase();
     }
     
-    // Функция фильтрации
+    /**
+     * Получает список предметов олимпиады из data-атрибута.
+     * @param {HTMLElement} card - Элемент карточки олимпиады.
+     * @returns {Array<string>} Массив названий предметов в нижнем регистре.
+     */
+    function getCardSubjects(card) {
+        const subjectsAttr = card.getAttribute('data-subjects') || '';
+        return subjectsAttr.toLowerCase().split(',').map(function(s) {
+            return s.trim();
+        });
+    }
+    
+    /**
+     * Фильтрует карточки олимпиад по поисковому запросу, статусу и предмету.
+     * После фильтрации применяет сортировку и обновляет отображение.
+     */
     function filterCards() {
         const searchTerm = searchInput.value.toLowerCase().trim();
         const statusValue = statusFilter.value;
+        const subjectValue = subjectFilter.value;
         
         filteredCards = allCards.filter(function(card) {
             // Фильтр по поиску
@@ -53,6 +82,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
+            // Фильтр по предмету
+            if (subjectValue !== 'all') {
+                const cardSubjects = getCardSubjects(card);
+                if (!cardSubjects.includes(subjectValue.toLowerCase())) {
+                    return false;
+                }
+            }
+            
             return true;
         });
         
@@ -63,7 +100,10 @@ document.addEventListener('DOMContentLoaded', function() {
         updateDisplay();
     }
     
-    // Функция сортировки
+    /**
+     * Сортирует отфильтрованные карточки олимпиад.
+     * Поддерживает сортировку по названию и дате начала.
+     */
     function sortCards() {
         const sortValue = sortFilter.value;
         
@@ -75,16 +115,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     ? titleA.localeCompare(titleB, 'ru')
                     : titleB.localeCompare(titleA, 'ru');
             } else if (sortValue === 'date-desc' || sortValue === 'date-asc') {
-                // Для примера сортируем по порядку в DOM (можно улучшить, добавив data-атрибуты с датами)
-                const indexA = allCards.indexOf(a);
-                const indexB = allCards.indexOf(b);
-                return sortValue === 'date-desc' ? indexB - indexA : indexA - indexB;
+                const dateA = new Date(a.getAttribute('data-start-date') || 0);
+                const dateB = new Date(b.getAttribute('data-start-date') || 0);
+                return sortValue === 'date-desc' ? dateB - dateA : dateA - dateB;
             }
             return 0;
         });
     }
     
-    // Функция обновления отображения
+    /**
+     * Обновляет отображение отфильтрованных карточек с учетом пагинации.
+     * Обновляет счетчик результатов и создает элементы пагинации.
+     */
     function updateDisplay() {
         // Обновление счетчика
         const count = filteredCards.length;
@@ -108,7 +150,10 @@ document.addEventListener('DOMContentLoaded', function() {
         updatePagination(totalPages);
     }
     
-    // Функция обновления пагинации
+    /**
+     * Создает и обновляет элементы пагинации.
+     * @param {number} totalPages - Общее количество страниц.
+     */
     function updatePagination(totalPages) {
         if (totalPages <= 1) {
             paginationContainer.style.display = 'none';
@@ -216,6 +261,11 @@ document.addEventListener('DOMContentLoaded', function() {
         filterCards();
     });
     
+    subjectFilter.addEventListener('change', function() {
+        currentPage = 1;
+        filterCards();
+    });
+    
     sortFilter.addEventListener('change', function() {
         currentPage = 1;
         filterCards();
@@ -224,6 +274,7 @@ document.addEventListener('DOMContentLoaded', function() {
     resetBtn.addEventListener('click', function() {
         searchInput.value = '';
         statusFilter.value = 'all';
+        subjectFilter.value = 'all';
         sortFilter.value = 'date-desc';
         currentPage = 1;
         filterCards();

@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import ContactForm
+from django.utils import timezone
+from .models import ContactForm, Olympiad, Subject
 
 
 def index(request):
@@ -47,5 +48,47 @@ def rules(request):
 
 
 def olympiads(request):
-    return render(request, 'olympiads.html')
+    """
+    Отображает страницу со списком олимпиад.
+    
+    Получает активные олимпиады из базы данных, определяет их статус
+    на основе текущей даты и передает в шаблон вместе со списком предметов.
+    
+    Returns:
+        HttpResponse: Рендеринг шаблона olympiads.html с контекстом олимпиад и предметов.
+    """
+    now = timezone.now()
+    olympiads_list = Olympiad.objects.filter(is_active=True).prefetch_related('subjects__subject')
+    
+    olympiads_with_status = []
+    for olympiad in olympiads_list:
+        if olympiad.end_date < now:
+            status = 'finished'
+            status_display = 'Завершена'
+        elif olympiad.start_date <= now <= olympiad.end_date:
+            status = 'active'
+            status_display = 'Активна'
+        else:
+            status = 'upcoming'
+            status_display = 'Скоро'
+        
+        subjects_list = [olympiad_subject.subject for olympiad_subject in olympiad.subjects.filter(is_active=True)]
+        subjects_names = [subject.name for subject in subjects_list]
+        
+        olympiads_with_status.append({
+            'olympiad': olympiad,
+            'status': status,
+            'status_display': status_display,
+            'subjects': subjects_list,
+            'subjects_names': subjects_names,
+        })
+    
+    all_subjects = Subject.objects.filter(is_active=True).order_by('name')
+    
+    context = {
+        'olympiads': olympiads_with_status,
+        'subjects': all_subjects,
+    }
+    
+    return render(request, 'olympiads.html', context)
 
