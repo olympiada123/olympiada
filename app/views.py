@@ -53,11 +53,13 @@ def olympiads(request):
     
     Получает активные олимпиады из базы данных, определяет их статус
     на основе текущей даты и передает в шаблон вместе со списком предметов.
+    Автоматически деактивирует завершенные олимпиады.
     
     Returns:
         HttpResponse: Рендеринг шаблона olympiads.html с контекстом олимпиад и предметов.
     """
     now = timezone.now()
+    Olympiad.objects.filter(is_active=True, end_date__lt=now).update(is_active=False)
     olympiads_list = Olympiad.objects.filter(is_active=True).prefetch_related('subjects__subject')
     
     olympiads_with_status = []
