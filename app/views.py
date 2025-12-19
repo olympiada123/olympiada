@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import ContactForm as ContactFormModel
+from .models import ContactForm
 
 
 def index(request):
@@ -23,7 +23,7 @@ def contact_form(request):
         message = request.POST.get('message')
         
         if name and email and subject and message:
-            ContactFormModel.objects.create(
+            ContactForm.objects.create(
                 name=name,
                 email=email,
                 subject=subject,
