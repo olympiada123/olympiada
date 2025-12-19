@@ -25,9 +25,26 @@
                 <a href="{% url 'contact_form' %}" class="nav-link">Обратная связь</a>
                 <a href="{% url 'olympiads' %}" class="nav-link">Олимпиады</a>
                 {% if user.is_authenticated %}
-                    <a href="/profile/" class="nav-link">Профиль</a>
-                    <a href="/results/" class="nav-link">Результаты</a>
-                    <a href="/logout/" class="nav-link btn-logout">Выход</a>
+                    <div class="user-dropdown">
+                        <button class="user-dropdown-toggle" id="userDropdownToggle">
+                            <span class="user-name">{% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.username }}{% endif %}</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </button>
+                        <div class="user-dropdown-menu" id="userDropdownMenu">
+                            <a href="/profile/" class="dropdown-item">
+                                <span class="dropdown-icon">👤</span>
+                                Личный кабинет
+                            </a>
+                            <a href="/settings/" class="dropdown-item">
+                                <span class="dropdown-icon">⚙️</span>
+                                Настройки
+                            </a>
+                            <a href="{% url 'logout' %}" class="dropdown-item">
+                                <span class="dropdown-icon">🚪</span>
+                                Выход
+                            </a>
+                        </div>
+                    </div>
                 {% else %}
                     <a href="{% url 'login' %}" class="nav-link btn-register">Вход</a>
                 {% endif %}
@@ -107,6 +124,7 @@
     </footer>
 
     <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/dropdown.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

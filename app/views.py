@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from .models import ContactForm, Olympiad, Subject
+from .models import ContactForm, Olympiad, Subject, CustomUser
 
 
 def index(request):
@@ -143,20 +145,110 @@ def olympiad_detail(request, olympiad_id):
 
 def login_view(request):
     """
-    Отображает страницу входа в систему.
+    Обрабатывает вход пользователя в систему.
+    
+    Args:
+        request: HTTP запрос. Может содержать POST данные с username и password.
     
     Returns:
-        HttpResponse: Рендеринг шаблона login.html.
+        HttpResponse: Рендеринг шаблона login.html или редирект на главную страницу.
     """
+    if request.user.is_authenticated:
+        return redirect('index')
+    
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        
+        if username and password:
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, f'Добро пожаловать, {user.get_full_name() or user.username}!')
+                return redirect('index')
+            else:
+                messages.error(request, 'Неверное имя пользователя или пароль.')
+        else:
+            messages.error(request, 'Пожалуйста, заполните все поля.')
+    
     return render(request, 'login.html')
 
 
 def register_view(request):
     """
-    Отображает страницу регистрации.
+    Обрабатывает регистрацию нового пользователя.
+    
+    Args:
+        request: HTTP запрос. Может содержать POST данные с данными пользователя.
     
     Returns:
-        HttpResponse: Рендеринг шаблона register.html.
+        HttpResponse: Рендеринг шаблона register.html или редирект на главную страницу.
     """
+    if request.user.is_authenticated:
+        return redirect('index')
+    
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
+        agree_terms = request.POST.get('agree_terms')
+        
+        if not agree_terms:
+            messages.error(request, 'Необходимо согласиться с правилами и условиями использования.')
+            return render(request, 'register.html')
+        
+        if not all([username, email, first_name, last_name, password1, password2]):
+            messages.error(request, 'Пожалуйста, заполните все обязательные поля.')
+            return render(request, 'register.html')
+        
+        if password1 != password2:
+            messages.error(request, 'Пароли не совпадают.')
+            return render(request, 'register.html')
+        
+        if len(password1) < 8:
+            messages.error(request, 'Пароль должен содержать минимум 8 символов.')
+            return render(request, 'register.html')
+        
+        if CustomUser.objects.filter(username=username).exists():
+            messages.error(request, 'Пользователь с таким именем уже существует.')
+            return render(request, 'register.html')
+        
+        if CustomUser.objects.filter(email=email).exists():
+            messages.error(request, 'Пользователь с таким email уже существует.')
+            return render(request, 'register.html')
+        
+        try:
+            user = CustomUser.objects.create_user(
+                username=username,
+                email=email,
+                password=password1,
+                first_name=first_name,
+                last_name=last_name,
+            )
+            login(request, user)
+            messages.success(request, f'Регистрация успешна! Добро пожаловать, {user.get_full_name() or user.username}!')
+            return redirect('index')
+        except Exception as e:
+            messages.error(request, f'Ошибка при регистрации: {str(e)}')
+    
     return render(request, 'register.html')
+
+
+@login_required
+def logout_view(request):
+    """
+    Обрабатывает выход пользователя из системы.
+    
+    Args:
+        request: HTTP запрос.
+    
+    Returns:
+        HttpResponse: Редирект на главную страницу.
+    """
+    logout(request)
+    messages.success(request, 'Вы успешно вышли из системы.')
+    return redirect('index')
 
