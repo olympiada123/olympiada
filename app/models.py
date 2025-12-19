@@ -424,13 +424,6 @@ class StudentRegistration(models.Model):
     Модель регистрации студента на олимпиаду
     """
 
-    STATUS_CHOICES = [
-        ("pending", "Ожидает подтверждения"),
-        ("approved", "Одобрена"),
-        ("rejected", "Отклонена"),
-        ("completed", "Завершена"),
-    ]
-
     student = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
@@ -446,14 +439,8 @@ class StudentRegistration(models.Model):
     subjects = models.ManyToManyField(
         Subject, related_name="student_registrations", verbose_name="Предметы"
     )
-    status = models.CharField(
-        max_length=20, choices=STATUS_CHOICES, default="pending", verbose_name="Статус"
-    )
     registered_at = models.DateTimeField(
         auto_now_add=True, verbose_name="Дата регистрации"
-    )
-    approved_at = models.DateTimeField(
-        blank=True, null=True, verbose_name="Дата одобрения"
     )
 
     class Meta:

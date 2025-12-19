@@ -226,9 +226,7 @@ def register_for_olympiad(request, olympiad_id):
     try:
         registration = StudentRegistration.objects.create(
             student=user,
-            olympiad=olympiad,
-            status='approved',
-            approved_at=timezone.now()
+            olympiad=olympiad
         )
         
         if subjects_list:
