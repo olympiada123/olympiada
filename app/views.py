@@ -480,6 +480,7 @@ def profile_view(request):
         'search_query': search_query,
         'contact_forms': contact_forms,
         'status_filter': status_filter,
+        'curator_olympiads': curator_olympiads,
     }
     
     return render(request, 'profile.html', context)
