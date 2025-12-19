@@ -34,4 +34,6 @@ urlpatterns = [
     path('profile/', views.profile_view, name='profile'),
     path('settings/', views.settings_view, name='settings'),
     path('olympiads/<int:olympiad_id>/register/', views.register_for_olympiad, name='register_for_olympiad'),
+    path('olympiads/create/', views.create_olympiad, name='create_olympiad'),
+    path('olympiads/<int:olympiad_id>/edit/', views.edit_olympiad, name='edit_olympiad'),
 ]

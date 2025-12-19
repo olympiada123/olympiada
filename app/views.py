@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.db import models
-from .models import ContactForm, Olympiad, Subject, CustomUser, StudentRegistration
+from .models import ContactForm, Olympiad, Subject, CustomUser, StudentRegistration, OlympiadSubject
 
 
 def index(request):
@@ -444,12 +444,18 @@ def profile_view(request):
             return redirect(f"{reverse('profile')}?{urlencode({'user_search': search_query})}")
         return redirect('profile')
     
-    registrations = StudentRegistration.objects.filter(student=user).select_related('olympiad').prefetch_related('subjects', 'olympiad__subjects__subject').order_by('-registered_at')
-    
+    registrations = None
     all_users = None
     search_query = None
     contact_forms = None
     status_filter = None
+    curator_olympiads = None
+    
+    if not user.is_superuser and not user.is_staff:
+        registrations = StudentRegistration.objects.filter(student=user).select_related('olympiad').prefetch_related('subjects', 'olympiad__subjects__subject').order_by('-registered_at')
+    
+    if user.is_staff and not user.is_superuser:
+        curator_olympiads = Olympiad.objects.all().order_by('-created_at')
     
     if user.is_superuser:
         search_query = request.GET.get('user_search', '').strip()
@@ -550,4 +556,197 @@ def settings_view(request):
     }
     
     return render(request, 'settings.html', context)
+
+
+@login_required
+def create_olympiad(request):
+    """
+    Создает новую олимпиаду.
+    
+    Args:
+        request: HTTP запрос. Может содержать POST данные с данными олимпиады.
+    
+    Returns:
+        HttpResponse: Рендеринг шаблона create_olympiad.html или редирект на профиль.
+    """
+    if not request.user.is_staff:
+        messages.error(request, 'У вас нет прав для создания олимпиад.')
+        return redirect('profile')
+    
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        description = request.POST.get('description', '')
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        registration_start = request.POST.get('registration_start')
+        registration_end = request.POST.get('registration_end')
+        max_subjects_per_student = request.POST.get('max_subjects_per_student', 1)
+        subject_ids = request.POST.getlist('subjects')
+        
+        if not all([name, start_date, end_date, registration_start, registration_end]):
+            messages.error(request, 'Пожалуйста, заполните все обязательные поля.')
+            all_subjects = Subject.objects.filter(is_active=True).order_by('name')
+            return render(request, 'create_olympiad.html', {'subjects': all_subjects})
+        
+        try:
+            from datetime import datetime
+            start_date_obj = datetime.strptime(start_date, '%Y-%m-%dT%H:%M')
+            end_date_obj = datetime.strptime(end_date, '%Y-%m-%dT%H:%M')
+            registration_start_obj = datetime.strptime(registration_start, '%Y-%m-%dT%H:%M')
+            registration_end_obj = datetime.strptime(registration_end, '%Y-%m-%dT%H:%M')
+            
+            if registration_start_obj >= registration_end_obj:
+                messages.error(request, 'Дата начала регистрации должна быть раньше даты окончания регистрации.')
+                all_subjects = Subject.objects.filter(is_active=True).order_by('name')
+                return render(request, 'create_olympiad.html', {'subjects': all_subjects})
+            
+            if start_date_obj >= end_date_obj:
+                messages.error(request, 'Дата начала олимпиады должна быть раньше даты окончания.')
+                all_subjects = Subject.objects.filter(is_active=True).order_by('name')
+                return render(request, 'create_olympiad.html', {'subjects': all_subjects})
+            
+            if registration_end_obj > start_date_obj:
+                messages.error(request, 'Регистрация должна завершиться до начала олимпиады.')
+                all_subjects = Subject.objects.filter(is_active=True).order_by('name')
+                return render(request, 'create_olympiad.html', {'subjects': all_subjects})
+            
+            olympiad = Olympiad.objects.create(
+                name=name,
+                description=description,
+                start_date=start_date_obj,
+                end_date=end_date_obj,
+                registration_start=registration_start_obj,
+                registration_end=registration_end_obj,
+                max_subjects_per_student=int(max_subjects_per_student) if max_subjects_per_student else 1
+            )
+            
+            if subject_ids:
+                for subject_id in subject_ids:
+                    try:
+                        subject = Subject.objects.get(id=subject_id, is_active=True)
+                        OlympiadSubject.objects.create(
+                            olympiad=olympiad,
+                            subject=subject
+                        )
+                    except Subject.DoesNotExist:
+                        continue
+            
+            messages.success(request, f'Олимпиада "{olympiad.name}" успешно создана.')
+            return redirect('profile')
+        except ValueError as e:
+            messages.error(request, f'Ошибка в формате даты: {str(e)}')
+        except Exception as e:
+            messages.error(request, f'Произошла ошибка при создании олимпиады: {str(e)}')
+    
+    all_subjects = Subject.objects.filter(is_active=True).order_by('name')
+    context = {
+        'subjects': all_subjects,
+    }
+    return render(request, 'create_olympiad.html', context)
+
+
+@login_required
+def edit_olympiad(request, olympiad_id):
+    """
+    Редактирует существующую олимпиаду.
+    
+    Args:
+        request: HTTP запрос. Может содержать POST данные с данными олимпиады.
+        olympiad_id: ID олимпиады для редактирования.
+    
+    Returns:
+        HttpResponse: Рендеринг шаблона edit_olympiad.html или редирект на профиль.
+    """
+    if not request.user.is_staff:
+        messages.error(request, 'У вас нет прав для редактирования олимпиад.')
+        return redirect('profile')
+    
+    olympiad = get_object_or_404(Olympiad, id=olympiad_id)
+    
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        description = request.POST.get('description', '')
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        registration_start = request.POST.get('registration_start')
+        registration_end = request.POST.get('registration_end')
+        max_subjects_per_student = request.POST.get('max_subjects_per_student', 1)
+        subject_ids = request.POST.getlist('subjects')
+        is_active = request.POST.get('is_active') == 'on'
+        
+        if not all([name, start_date, end_date, registration_start, registration_end]):
+            messages.error(request, 'Пожалуйста, заполните все обязательные поля.')
+            all_subjects = Subject.objects.filter(is_active=True).order_by('name')
+            current_subjects = [os.subject.id for os in olympiad.subjects.filter(is_active=True)]
+            return render(request, 'edit_olympiad.html', {
+                'olympiad': olympiad,
+                'subjects': all_subjects,
+                'current_subjects': current_subjects
+            })
+        
+        try:
+            from datetime import datetime
+            start_date_obj = datetime.strptime(start_date, '%Y-%m-%dT%H:%M')
+            end_date_obj = datetime.strptime(end_date, '%Y-%m-%dT%H:%M')
+            registration_start_obj = datetime.strptime(registration_start, '%Y-%m-%dT%H:%M')
+            registration_end_obj = datetime.strptime(registration_end, '%Y-%m-%dT%H:%M')
+            
+            if registration_start_obj >= registration_end_obj:
+                messages.error(request, 'Дата начала регистрации должна быть раньше даты окончания регистрации.')
+                all_subjects = Subject.objects.filter(is_active=True).order_by('name')
+                current_subjects = [os.subject.id for os in olympiad.subjects.filter(is_active=True)]
+                return render(request, 'edit_olympiad.html', {
+                    'olympiad': olympiad,
+                    'subjects': all_subjects,
+                    'current_subjects': current_subjects
+                })
+            
+            if start_date_obj >= end_date_obj:
+                messages.error(request, 'Дата начала олимпиады должна быть раньше даты окончания.')
+                all_subjects = Subject.objects.filter(is_active=True).order_by('name')
+                current_subjects = [os.subject.id for os in olympiad.subjects.filter(is_active=True)]
+                return render(request, 'edit_olympiad.html', {
+                    'olympiad': olympiad,
+                    'subjects': all_subjects,
+                    'current_subjects': current_subjects
+                })
+            
+            olympiad.name = name
+            olympiad.description = description
+            olympiad.start_date = start_date_obj
+            olympiad.end_date = end_date_obj
+            olympiad.registration_start = registration_start_obj
+            olympiad.registration_end = registration_end_obj
+            olympiad.max_subjects_per_student = int(max_subjects_per_student) if max_subjects_per_student else 1
+            olympiad.is_active = is_active
+            olympiad.save()
+            
+            olympiad.subjects.all().delete()
+            if subject_ids:
+                for subject_id in subject_ids:
+                    try:
+                        subject = Subject.objects.get(id=subject_id, is_active=True)
+                        OlympiadSubject.objects.create(
+                            olympiad=olympiad,
+                            subject=subject
+                        )
+                    except Subject.DoesNotExist:
+                        continue
+            
+            messages.success(request, f'Олимпиада "{olympiad.name}" успешно обновлена.')
+            return redirect('profile')
+        except ValueError as e:
+            messages.error(request, f'Ошибка в формате даты: {str(e)}')
+        except Exception as e:
+            messages.error(request, f'Произошла ошибка при обновлении олимпиады: {str(e)}')
+    
+    all_subjects = Subject.objects.filter(is_active=True).order_by('name')
+    current_subjects = [os.subject.id for os in olympiad.subjects.filter(is_active=True)]
+    
+    context = {
+        'olympiad': olympiad,
+        'subjects': all_subjects,
+        'current_subjects': current_subjects,
+    }
+    return render(request, 'edit_olympiad.html', context)
 

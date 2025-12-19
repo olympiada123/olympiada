@@ -2782,7 +2782,7 @@ textarea.form-control {
     margin-top: 0.5rem;
 }
 
-.form-checkbox {
+label.form-checkbox {
     display: flex;
     align-items: flex-start;
     gap: 0.75rem;
@@ -2790,14 +2790,20 @@ textarea.form-control {
     font-size: 0.95rem;
     color: var(--text-secondary);
     line-height: 1.6;
+    width: 100%;
+    margin: 0;
 }
 
-.form-checkbox input[type="checkbox"] {
-    margin-top: 0.25rem;
+label.form-checkbox input[type="checkbox"] {
+    margin-top: 0.2rem;
     width: 18px;
     height: 18px;
     cursor: pointer;
     flex-shrink: 0;
+}
+
+label.form-checkbox span {
+    flex: 1;
 }
 
 .form-checkbox a {
@@ -3194,6 +3200,154 @@ textarea.form-control {
     }
 
     .user-search-btn {
+        width: 100%;
+    }
+}
+
+.curator-actions {
+    margin-bottom: 2rem;
+}
+
+.curator-olympiads-list {
+    width: 100%;
+}
+
+.curator-olympiad-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.25rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    transition: var(--transition);
+}
+
+.curator-olympiad-item:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--primary-color);
+}
+
+.curator-olympiad-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.curator-olympiad-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 0.75rem 0;
+}
+
+.curator-olympiad-link {
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.curator-olympiad-link:hover {
+    color: var(--primary-color);
+}
+
+.curator-olympiad-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.curator-olympiad-date,
+.curator-olympiad-registration {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.curator-olympiad-actions {
+    flex-shrink: 0;
+}
+
+.section-subtitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.olympiad-form {
+    width: 100%;
+    max-width: 800px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.form-checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-radius: 0.5rem;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.form-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.form-checkbox {
+    width: 1.25rem;
+    height: 1.25rem;
+    cursor: pointer;
+    accent-color: var(--primary-color);
+}
+
+.form-checkbox-label {
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .curator-olympiad-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .curator-olympiad-actions {
+        width: 100%;
+    }
+
+    .curator-olympiad-actions .btn {
+        width: 100%;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions .btn {
         width: 100%;
     }
 }

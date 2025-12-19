@@ -45,7 +45,7 @@
                     </div>
                 </div>
 
-                {% if not user.is_superuser %}
+                {% if not user.is_superuser and not user.is_staff %}
                 <div class="detail-section-card profile-olympiads-card">
                 <h2 class="section-title">Мои олимпиады</h2>
                 {% if registrations %}
@@ -80,6 +80,42 @@
                     <a href="{% url 'olympiads' %}" class="btn btn-primary">Посмотреть олимпиады</a>
                 </div>
                 {% endif %}
+                </div>
+                {% endif %}
+
+                {% if user.is_staff and not user.is_superuser %}
+                <div class="detail-section-card profile-olympiads-card">
+                    <h2 class="section-title">Управление олимпиадами</h2>
+                    <div class="curator-actions">
+                        <a href="{% url 'create_olympiad' %}" class="btn btn-primary">Создать новую олимпиаду</a>
+                    </div>
+                    {% if curator_olympiads %}
+                    <div class="curator-olympiads-list">
+                        <h3 class="section-subtitle" style="margin-top: 2rem; margin-bottom: 1rem;">Мои олимпиады</h3>
+                        {% for olympiad in curator_olympiads %}
+                        <div class="curator-olympiad-item">
+                            <div class="curator-olympiad-info">
+                                <h4 class="curator-olympiad-title">
+                                    <a href="{% url 'olympiad_detail' olympiad.id %}" class="curator-olympiad-link">
+                                        {{ olympiad.name }}
+                                    </a>
+                                </h4>
+                                <div class="curator-olympiad-details">
+                                    <span class="curator-olympiad-date">Дата проведения: {{ olympiad.start_date|date:"d.m.Y" }} - {{ olympiad.end_date|date:"d.m.Y" }}</span>
+                                    <span class="curator-olympiad-registration">Регистрация: {{ olympiad.registration_start|date:"d.m.Y" }} - {{ olympiad.registration_end|date:"d.m.Y" }}</span>
+                                </div>
+                            </div>
+                            <div class="curator-olympiad-actions">
+                                <a href="{% url 'edit_olympiad' olympiad.id %}" class="btn btn-secondary btn-sm">Редактировать</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <p class="empty-state-text">Вы еще не создали ни одной олимпиады.</p>
+                    </div>
+                    {% endif %}
                 </div>
                 {% endif %}
 

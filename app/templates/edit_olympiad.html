@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактировать олимпиаду - Олимпиада{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="about-page">
+        <h1 class="about-page-title">Редактировать олимпиаду</h1>
+
+        <section class="about-section">
+            <div class="detail-section-card">
+                <a href="{% url 'profile' %}" class="back-link">← Назад к профилю</a>
+                
+                <form method="post" class="olympiad-form">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="id_name" class="form-label">Название олимпиады *</label>
+                        <input 
+                            type="text" 
+                            name="name" 
+                            id="id_name" 
+                            class="form-control" 
+                            value="{{ olympiad.name }}"
+                            required 
+                            placeholder="Введите название олимпиады"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_description" class="form-label">Описание</label>
+                        <textarea 
+                            name="description" 
+                            id="id_description" 
+                            class="form-control" 
+                            rows="5"
+                            placeholder="Введите описание олимпиады"
+                        >{{ olympiad.description }}</textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="id_start_date" class="form-label">Дата начала олимпиады *</label>
+                            <input 
+                                type="datetime-local" 
+                                name="start_date" 
+                                id="id_start_date" 
+                                class="form-control" 
+                                value="{{ olympiad.start_date|date:'Y-m-d\TH:i' }}"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id_end_date" class="form-label">Дата окончания олимпиады *</label>
+                            <input 
+                                type="datetime-local" 
+                                name="end_date" 
+                                id="id_end_date" 
+                                class="form-control" 
+                                value="{{ olympiad.end_date|date:'Y-m-d\TH:i' }}"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="id_registration_start" class="form-label">Начало регистрации *</label>
+                            <input 
+                                type="datetime-local" 
+                                name="registration_start" 
+                                id="id_registration_start" 
+                                class="form-control" 
+                                value="{{ olympiad.registration_start|date:'Y-m-d\TH:i' }}"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id_registration_end" class="form-label">Окончание регистрации *</label>
+                            <input 
+                                type="datetime-local" 
+                                name="registration_end" 
+                                id="id_registration_end" 
+                                class="form-control" 
+                                value="{{ olympiad.registration_end|date:'Y-m-d\TH:i' }}"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_max_subjects_per_student" class="form-label">Максимум предметов на студента *</label>
+                        <input 
+                            type="number" 
+                            name="max_subjects_per_student" 
+                            id="id_max_subjects_per_student" 
+                            class="form-control" 
+                            value="{{ olympiad.max_subjects_per_student }}"
+                            min="1"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Предметы олимпиады *</label>
+                        <div class="subjects-checkbox-group">
+                            {% for subject in subjects %}
+                            <div class="form-checkbox-item">
+                                <input 
+                                    type="checkbox" 
+                                    name="subjects" 
+                                    id="subject_{{ subject.id }}" 
+                                    value="{{ subject.id }}"
+                                    class="form-checkbox"
+                                    {% if subject.id in current_subjects %}checked{% endif %}
+                                >
+                                <label for="subject_{{ subject.id }}" class="form-checkbox-label">{{ subject.name }}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% if not subjects %}
+                        <p class="form-help-text" style="color: var(--text-secondary);">Нет доступных предметов. Создайте предметы в админ-панели.</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-checkbox-item">
+                            <input 
+                                type="checkbox" 
+                                name="is_active" 
+                                id="id_is_active" 
+                                class="form-checkbox"
+                                {% if olympiad.is_active %}checked{% endif %}
+                            >
+                            <label for="id_is_active" class="form-checkbox-label">Олимпиада активна</label>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                        <a href="{% url 'profile' %}" class="btn btn-secondary">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
