@@ -2678,9 +2678,13 @@ textarea.form-control {
     width: 100%;
 }
 
+.settings-card {
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+
 .settings-form {
     width: 100%;
-    max-width: 600px;
 }
 
 .form-group {
@@ -2839,6 +2843,11 @@ textarea.form-control {
 .profile-olympiads-card {
     flex: 0 0 66.666%;
     max-width: 66.666%;
+}
+
+.settings-card {
+    flex: 0 0 50%;
+    max-width: 50%;
 }
 
 .profile-info-compact {
