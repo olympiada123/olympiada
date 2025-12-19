@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from .models import ContactForm, Olympiad, Subject, CustomUser, StudentRegistration
 
 
@@ -282,4 +284,77 @@ def profile_view(request):
     }
     
     return render(request, 'profile.html', context)
+
+
+@login_required
+def settings_view(request):
+    """
+    Отображает страницу настроек пользователя и обрабатывает изменения.
+    
+    Args:
+        request: HTTP запрос. Может содержать POST данные для обновления профиля.
+    
+    Returns:
+        HttpResponse: Рендеринг шаблона settings.html или редирект на страницу настроек.
+    """
+    user = request.user
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'update_profile':
+            first_name = request.POST.get('first_name', '').strip()
+            last_name = request.POST.get('last_name', '').strip()
+            student_id = request.POST.get('student_id', '').strip()
+            
+            if first_name:
+                user.first_name = first_name
+            if last_name:
+                user.last_name = last_name
+            if student_id:
+                if CustomUser.objects.filter(student_id=student_id).exclude(id=user.id).exists():
+                    messages.error(request, 'Студенческий билет с таким номером уже используется.')
+                else:
+                    user.student_id = student_id
+            else:
+                user.student_id = None
+            
+            user.save()
+            messages.success(request, 'Профиль успешно обновлен.')
+            return redirect('settings')
+        
+        elif action == 'change_password':
+            old_password = request.POST.get('old_password')
+            new_password1 = request.POST.get('new_password1')
+            new_password2 = request.POST.get('new_password2')
+            
+            if not old_password or not new_password1 or not new_password2:
+                messages.error(request, 'Пожалуйста, заполните все поля.')
+                return redirect('settings')
+            
+            if not user.check_password(old_password):
+                messages.error(request, 'Неверный текущий пароль.')
+                return redirect('settings')
+            
+            if new_password1 != new_password2:
+                messages.error(request, 'Новые пароли не совпадают.')
+                return redirect('settings')
+            
+            try:
+                validate_password(new_password1, user)
+            except ValidationError as e:
+                messages.error(request, '; '.join(e.messages))
+                return redirect('settings')
+            
+            user.set_password(new_password1)
+            user.save()
+            update_session_auth_hash(request, user)
+            messages.success(request, 'Пароль успешно изменен.')
+            return redirect('settings')
+    
+    context = {
+        'user': user,
+    }
+    
+    return render(request, 'settings.html', context)
 

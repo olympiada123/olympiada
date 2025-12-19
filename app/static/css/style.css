@@ -2678,6 +2678,11 @@ textarea.form-control {
     width: 100%;
 }
 
+.settings-form {
+    width: 100%;
+    max-width: 600px;
+}
+
 .form-group {
     margin-bottom: 1.5rem;
 }
@@ -2868,12 +2873,51 @@ textarea.form-control {
     border-radius: 0.375rem;
 }
 
+.profile-info-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.profile-info-header .section-title {
+    margin: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+    flex: 1;
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
 .profile-info-content {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
     flex: 1;
     min-width: 0;
+}
+
+.profile-info-actions {
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.profile-info-actions .btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-icon {
+    font-size: 1rem;
 }
 
 .profile-info-label {

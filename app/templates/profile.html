@@ -36,6 +36,12 @@
                                 <span class="profile-info-value">{{ user.created_at|date:"d.m.Y" }}</span>
                             </div>
                         </div>
+                        <div class="profile-info-actions">
+                            <a href="{% url 'settings' %}" class="btn btn-secondary btn-sm">
+                                <span class="btn-icon">✏️</span>
+                                Редактировать профиль
+                            </a>
+                        </div>
                     </div>
                 </div>
 
