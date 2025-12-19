@@ -18,9 +18,9 @@
                 </a>
             </div>
             <div class="nav-menu" id="navMenu">
-                <a href="/" class="nav-link">Главная</a>
                 <a href="{% url 'about' %}" class="nav-link">О платформе</a>
                 <a href="{% url 'contacts' %}" class="nav-link">Контакты</a>
+                <a href="{% url 'contact_form' %}" class="nav-link">Обратная связь</a>
                 <a href="/olympiads/" class="nav-link">Олимпиады</a>
                 {% if user.is_authenticated %}
                     <a href="/profile/" class="nav-link">Профиль</a>

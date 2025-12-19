@@ -1343,3 +1343,22 @@ textarea.form-control {
     }
 }
 
+.contact-form {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.contact-form .form-group:last-of-type {
+    margin-bottom: 0;
+}
+
+.contact-form textarea.form-control {
+    min-height: 150px;
+}
+
+@media (max-width: 768px) {
+    .contact-form {
+        max-width: 100%;
+    }
+}
+
