@@ -143,21 +143,29 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: none;
-    border: 2px solid var(--border-color);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 0.5rem;
-    padding: 0.5rem 1rem;
+    padding: 0.625rem 1rem;
     color: var(--text-primary);
     font-weight: 500;
     cursor: pointer;
     transition: var(--transition);
-    font-size: 1rem;
+    font-size: 0.95rem;
+    box-shadow: var(--shadow-sm);
 }
 
 .user-dropdown-toggle:hover {
+    background: var(--bg-tertiary);
     border-color: var(--primary-color);
     color: var(--primary-color);
-    background: var(--bg-secondary);
+    box-shadow: var(--shadow-md);
+}
+
+.user-dropdown.active .user-dropdown-toggle {
+    background: var(--bg-tertiary);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
 }
 
 .user-name {
