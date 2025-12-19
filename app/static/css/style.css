@@ -1410,9 +1410,19 @@ textarea.form-control {
     margin-bottom: 2rem;
 }
 
+.faq-intro-text {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    line-height: 1.8;
+    text-align: left;
+    max-width: 800px;
+    margin: 0 0 3rem 0;
+}
+
 .faq-container {
-    max-width: 900px;
-    margin: 0 auto;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
 }
 
 .faq-item {
@@ -1487,19 +1497,20 @@ textarea.form-control {
     color: white;
 }
 
-.faq-answer {
+.faq-item .faq-answer {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.3s ease-out, padding 0.3s ease-out;
-    padding: 0 1.5rem;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0;
+    margin: 0;
 }
 
 .faq-item.active .faq-answer {
-    max-height: 500px;
+    max-height: 1000px;
     padding: 1.5rem;
 }
 
-.faq-answer p {
+.faq-item .faq-answer p {
     color: var(--text-secondary);
     line-height: 1.8;
     margin: 0;
