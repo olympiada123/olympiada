@@ -1745,8 +1745,8 @@ textarea.form-control {
     width: 100%;
     max-width: 100%;
     margin: 0;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
     gap: 2rem;
 }
 
@@ -1878,7 +1878,17 @@ textarea.form-control {
     pointer-events: none;
 }
 
+@media (max-width: 968px) {
+    .olympiads-container {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+}
+
 @media (max-width: 768px) {
+    .olympiads-container {
+        grid-template-columns: 1fr;
+    }
+
     .olympiad-header {
         padding: 1.25rem;
     }
