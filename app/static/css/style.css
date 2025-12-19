@@ -2558,9 +2558,17 @@ textarea.form-control {
     border: 1px solid var(--border-color);
     border-radius: 0.75rem;
     padding: 2.5rem;
-    max-width: 600px;
+    max-width: 480px;
     margin: 0 auto;
     box-shadow: var(--shadow-md);
+}
+
+.auth-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 1rem 0;
+    text-align: center;
 }
 
 .auth-description {

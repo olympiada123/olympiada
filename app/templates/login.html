@@ -5,10 +5,9 @@
 {% block content %}
 <div class="container">
     <div class="about-page">
-        <h1 class="about-page-title">Вход</h1>
-
         <section class="about-section">
             <div class="auth-card">
+                <h1 class="auth-title">Вход</h1>
                 <p class="auth-description">
                     Войдите в свой аккаунт, чтобы получить доступ к олимпиадам и просмотру результатов.
                 </p>
@@ -42,22 +41,14 @@
                         >
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-checkbox">
-                            <input type="checkbox" name="remember_me" id="id_remember_me">
-                            <span>Запомнить меня</span>
-                        </label>
-                    </div>
-
                     <div class="form-group" style="margin-top: 2rem;">
-                        <button type="submit" class="btn btn-primary" style="width: 100%; max-width: 300px;">
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">
                             Войти
                         </button>
                     </div>
 
                     <div class="auth-links">
                         <a href="{% url 'register' %}" class="auth-link">Нет аккаунта? Зарегистрироваться</a>
-                        <a href="#" class="auth-link">Забыли пароль?</a>
                     </div>
                 </form>
             </div>
