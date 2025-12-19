@@ -23,7 +23,7 @@
                 <a href="{% url 'faq' %}" class="nav-link">FAQ</a>
                 <a href="{% url 'rules' %}" class="nav-link">Правила</a>
                 <a href="{% url 'contact_form' %}" class="nav-link">Обратная связь</a>
-                <a href="/olympiads/" class="nav-link">Олимпиады</a>
+                <a href="{% url 'olympiads' %}" class="nav-link">Олимпиады</a>
                 {% if user.is_authenticated %}
                     <a href="/profile/" class="nav-link">Профиль</a>
                     <a href="/results/" class="nav-link">Результаты</a>

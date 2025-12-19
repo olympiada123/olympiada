@@ -45,3 +45,7 @@ def faq(request):
 def rules(request):
     return render(request, 'rules.html')
 
+
+def olympiads(request):
+    return render(request, 'olympiads.html')
+
