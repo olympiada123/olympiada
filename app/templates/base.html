@@ -29,7 +29,7 @@
                     <a href="/results/" class="nav-link">Результаты</a>
                     <a href="/logout/" class="nav-link btn-logout">Выход</a>
                 {% else %}
-                    <a href="/login/" class="nav-link btn-register">Вход</a>
+                    <a href="{% url 'login' %}" class="nav-link btn-register">Вход</a>
                 {% endif %}
             </div>
             <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">

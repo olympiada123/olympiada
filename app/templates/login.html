@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Вход - Олимпиада{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="about-page">
+        <h1 class="about-page-title">Вход</h1>
+
+        <section class="about-section">
+            <div class="auth-card">
+                <p class="auth-description">
+                    Войдите в свой аккаунт, чтобы получить доступ к олимпиадам и просмотру результатов.
+                </p>
+
+                <form method="post" class="auth-form">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="id_username" class="form-label">Имя пользователя или Email *</label>
+                        <input 
+                            type="text" 
+                            name="username" 
+                            id="id_username" 
+                            class="form-control" 
+                            required 
+                            placeholder="Введите имя пользователя или email"
+                            autocomplete="username"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_password" class="form-label">Пароль *</label>
+                        <input 
+                            type="password" 
+                            name="password" 
+                            id="id_password" 
+                            class="form-control" 
+                            required 
+                            placeholder="Введите пароль"
+                            autocomplete="current-password"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-checkbox">
+                            <input type="checkbox" name="remember_me" id="id_remember_me">
+                            <span>Запомнить меня</span>
+                        </label>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 2rem;">
+                        <button type="submit" class="btn btn-primary" style="width: 100%; max-width: 300px;">
+                            Войти
+                        </button>
+                    </div>
+
+                    <div class="auth-links">
+                        <a href="{% url 'register' %}" class="auth-link">Нет аккаунта? Зарегистрироваться</a>
+                        <a href="#" class="auth-link">Забыли пароль?</a>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+

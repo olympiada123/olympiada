@@ -28,4 +28,6 @@ urlpatterns = [
     path('rules/', views.rules, name='rules'),
     path('olympiads/', views.olympiads, name='olympiads'),
     path('olympiads/<int:olympiad_id>/', views.olympiad_detail, name='olympiad_detail'),
+    path('login/', views.login_view, name='login'),
+    path('register/', views.register_view, name='register'),
 ]

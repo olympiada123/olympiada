@@ -140,3 +140,23 @@ def olympiad_detail(request, olympiad_id):
     
     return render(request, 'olympiad_detail.html', context)
 
+
+def login_view(request):
+    """
+    Отображает страницу входа в систему.
+    
+    Returns:
+        HttpResponse: Рендеринг шаблона login.html.
+    """
+    return render(request, 'login.html')
+
+
+def register_view(request):
+    """
+    Отображает страницу регистрации.
+    
+    Returns:
+        HttpResponse: Рендеринг шаблона register.html.
+    """
+    return render(request, 'register.html')
+
