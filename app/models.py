@@ -884,3 +884,38 @@ class Result(models.Model):
             self.percentage = 0
         self.save()
         return self.percentage
+
+
+class ContactForm(models.Model):
+    """
+    Модель формы обратной связи
+    """
+
+    STATUS_CHOICES = [
+        ("not_processed", "Не обработана"),
+        ("in_progress", "В обработке"),
+        ("reviewed", "Рассмотрена"),
+    ]
+
+    name = models.CharField(max_length=200, verbose_name="Имя")
+    email = models.EmailField(verbose_name="Email")
+    subject = models.CharField(max_length=200, verbose_name="Тема")
+    message = models.TextField(verbose_name="Сообщение")
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="not_processed",
+        verbose_name="Статус",
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name="Дата создания"
+    )
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
+
+    class Meta:
+        verbose_name = "Форма обратной связи"
+        verbose_name_plural = "Формы обратной связи"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.name} - {self.subject} ({self.get_status_display()})"
