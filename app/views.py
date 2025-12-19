@@ -136,14 +136,100 @@ def olympiad_detail(request, olympiad_id):
     
     subjects_list = [olympiad_subject.subject for olympiad_subject in olympiad.subjects.filter(is_active=True)]
     
+    is_registered = False
+    registration = None
+    if request.user.is_authenticated:
+        registration = StudentRegistration.objects.filter(
+            student=request.user,
+            olympiad=olympiad
+        ).first()
+        is_registered = registration is not None
+    
+    can_register = False
+    if request.user.is_authenticated and not request.user.is_superuser and not request.user.is_staff:
+        can_register = (
+            olympiad.registration_start <= now <= olympiad.registration_end and
+            not is_registered and
+            status != 'finished'
+        )
+    
     context = {
         'olympiad': olympiad,
         'status': status,
         'status_display': status_display,
         'subjects': subjects_list,
+        'is_registered': is_registered,
+        'registration': registration,
+        'can_register': can_register,
     }
     
     return render(request, 'olympiad_detail.html', context)
+
+
+@login_required
+def register_for_olympiad(request, olympiad_id):
+    """
+    Обрабатывает регистрацию студента на олимпиаду.
+    
+    Args:
+        request: HTTP запрос.
+        olympiad_id: ID олимпиады для регистрации.
+    
+    Returns:
+        HttpResponse: Редирект на страницу деталей олимпиады с сообщением.
+    """
+    olympiad = get_object_or_404(Olympiad, id=olympiad_id)
+    user = request.user
+    
+    if user.is_superuser or user.is_staff:
+        messages.error(request, 'Администраторы и кураторы не могут регистрироваться на олимпиады.')
+        return redirect('olympiad_detail', olympiad_id=olympiad_id)
+    
+    if not user.student_id:
+        messages.error(request, 'Для регистрации на олимпиаду необходимо указать номер студенческого билета в настройках профиля.')
+        return redirect('olympiad_detail', olympiad_id=olympiad_id)
+    
+    now = timezone.now()
+    
+    if now < olympiad.registration_start:
+        messages.error(request, 'Регистрация на олимпиаду еще не открыта.')
+        return redirect('olympiad_detail', olympiad_id=olympiad_id)
+    
+    if now > olympiad.registration_end:
+        messages.error(request, 'Регистрация на олимпиаду уже закрыта.')
+        return redirect('olympiad_detail', olympiad_id=olympiad_id)
+    
+    existing_registration = StudentRegistration.objects.filter(
+        student=user,
+        olympiad=olympiad
+    ).first()
+    
+    if existing_registration:
+        messages.info(request, 'Вы уже зарегистрированы на эту олимпиаду.')
+        return redirect('olympiad_detail', olympiad_id=olympiad_id)
+    
+    subjects_list = [olympiad_subject.subject for olympiad_subject in olympiad.subjects.filter(is_active=True)]
+    
+    if not subjects_list:
+        messages.error(request, 'На олимпиаде нет доступных предметов.')
+        return redirect('olympiad_detail', olympiad_id=olympiad_id)
+    
+    try:
+        registration = StudentRegistration.objects.create(
+            student=user,
+            olympiad=olympiad,
+            status='approved',
+            approved_at=timezone.now()
+        )
+        
+        if subjects_list:
+            registration.subjects.set(subjects_list[:olympiad.max_subjects_per_student])
+        
+        messages.success(request, f'Вы успешно зарегистрированы на олимпиаду "{olympiad.name}".')
+    except Exception as e:
+        messages.error(request, f'Произошла ошибка при регистрации: {str(e)}')
+    
+    return redirect('olympiad_detail', olympiad_id=olympiad_id)
 
 
 def login_view(request):

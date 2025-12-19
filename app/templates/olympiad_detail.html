@@ -61,12 +61,26 @@
 
             <div class="detail-section-card detail-actions-card">
                 <div class="olympiad-detail-actions">
-                    {% if status == 'active' %}
-                    <a href="#" class="btn btn-primary btn-large">Зарегистрироваться</a>
-                    {% elif status == 'upcoming' %}
-                    <a href="#" class="btn btn-primary btn-large" disabled>Регистрация скоро откроется</a>
-                    {% elif status == 'finished' %}
-                    <a href="#" class="btn btn-secondary btn-large">Посмотреть результаты</a>
+                    {% if user.is_authenticated %}
+                        {% if is_registered %}
+                            <span class="btn btn-secondary btn-large" style="cursor: default;">Вы уже зарегистрированы</span>
+                        {% elif can_register %}
+                            <a href="{% url 'register_for_olympiad' olympiad.id %}" class="btn btn-primary btn-large">Зарегистрироваться</a>
+                        {% elif status == 'upcoming' %}
+                            <span class="btn btn-secondary btn-large" style="cursor: default;">Регистрация скоро откроется</span>
+                        {% elif status == 'finished' %}
+                            <span class="btn btn-secondary btn-large" style="cursor: default;">Олимпиада завершена</span>
+                        {% else %}
+                            <span class="btn btn-secondary btn-large" style="cursor: default;">Регистрация закрыта</span>
+                        {% endif %}
+                    {% else %}
+                        {% if status == 'active' %}
+                            <a href="{% url 'login' %}?next={% url 'olympiad_detail' olympiad.id %}" class="btn btn-primary btn-large">Войти для регистрации</a>
+                        {% elif status == 'upcoming' %}
+                            <span class="btn btn-secondary btn-large" style="cursor: default;">Регистрация скоро откроется</span>
+                        {% elif status == 'finished' %}
+                            <span class="btn btn-secondary btn-large" style="cursor: default;">Олимпиада завершена</span>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>
