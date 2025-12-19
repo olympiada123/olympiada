@@ -37,3 +37,7 @@ def contact_form(request):
     
     return render(request, 'contact_form.html')
 
+
+def faq(request):
+    return render(request, 'faq.html')
+
