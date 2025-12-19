@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block title %}Создать вопрос - {{ olympiad.name }} - {{ subject.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="about-page">
+        <h1 class="about-page-title">Создать вопрос</h1>
+
+        <section class="about-section">
+            <div class="detail-section-card">
+                <a href="{% url 'manage_questions' olympiad.id subject.id %}" class="back-link">← Назад к вопросам</a>
+                
+                <form method="post" class="olympiad-form">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="id_text" class="form-label">Текст вопроса *</label>
+                        <textarea 
+                            name="text" 
+                            id="id_text" 
+                            class="form-control" 
+                            rows="4"
+                            required 
+                            placeholder="Введите текст вопроса"
+                        ></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_description" class="form-label">Дополнительное описание</label>
+                        <textarea 
+                            name="description" 
+                            id="id_description" 
+                            class="form-control" 
+                            rows="3"
+                            placeholder="Дополнительное описание (необязательно)"
+                        ></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="id_scoring_method" class="form-label">Метод оценки *</label>
+                            <select name="scoring_method" id="id_scoring_method" class="form-control" required>
+                                <option value="weighted_sum">Взвешенная сумма ответов</option>
+                                <option value="proportional">Пропорциональное распределение</option>
+                                <option value="threshold">Пороговая система</option>
+                                <option value="combinatorial">Комбинаторная оценка</option>
+                                <option value="adaptive">Адаптивная оценка</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id_difficulty_level" class="form-label">Уровень сложности *</label>
+                            <select name="difficulty_level" id="id_difficulty_level" class="form-control" required>
+                                <option value="basic">Базовый</option>
+                                <option value="intermediate" selected>Средний</option>
+                                <option value="advanced">Продвинутый</option>
+                                <option value="expert">Экспертный</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="id_base_points" class="form-label">Базовые баллы *</label>
+                            <input 
+                                type="number" 
+                                name="base_points" 
+                                id="id_base_points" 
+                                class="form-control" 
+                                value="1.0"
+                                step="0.1"
+                                min="0"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id_max_points" class="form-label">Максимальные баллы *</label>
+                            <input 
+                                type="number" 
+                                name="max_points" 
+                                id="id_max_points" 
+                                class="form-control" 
+                                value="1.0"
+                                step="0.1"
+                                min="0"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_min_points" class="form-label">Минимальные баллы *</label>
+                        <input 
+                            type="number" 
+                            name="min_points" 
+                            id="id_min_points" 
+                            class="form-control" 
+                            value="0.0"
+                            step="0.1"
+                            min="0"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_order" class="form-label">Порядок вопроса *</label>
+                        <input 
+                            type="number" 
+                            name="order" 
+                            id="id_order" 
+                            class="form-control" 
+                            value="0"
+                            min="0"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Варианты ответов *</label>
+                        <div id="answers-container">
+                            <div class="answer-item">
+                                <div class="form-row">
+                                    <div class="form-group" style="flex: 1;">
+                                        <input 
+                                            type="text" 
+                                            name="answer_text[]" 
+                                            class="form-control" 
+                                            placeholder="Текст ответа"
+                                            required
+                                        >
+                                    </div>
+                                    <div class="form-group" style="width: 150px;">
+                                        <input 
+                                            type="number" 
+                                            name="answer_weight[]" 
+                                            class="form-control" 
+                                            placeholder="Вес (-1.0 до 1.0)"
+                                            step="0.1"
+                                            min="-1"
+                                            max="1"
+                                            value="0.0"
+                                            required
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" id="add-answer-btn" class="btn btn-secondary btn-sm" style="margin-top: 0.5rem;">Добавить ответ</button>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Создать вопрос</button>
+                        <a href="{% url 'manage_questions' olympiad.id subject.id %}" class="btn btn-secondary">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const addAnswerBtn = document.getElementById('add-answer-btn');
+    const answersContainer = document.getElementById('answers-container');
+    
+    addAnswerBtn.addEventListener('click', function() {
+        const answerItem = document.createElement('div');
+        answerItem.className = 'answer-item';
+        answerItem.innerHTML = `
+            <div class="form-row">
+                <div class="form-group" style="flex: 1;">
+                    <input 
+                        type="text" 
+                        name="answer_text[]" 
+                        class="form-control" 
+                        placeholder="Текст ответа"
+                        required
+                    >
+                </div>
+                <div class="form-group" style="width: 150px;">
+                    <input 
+                        type="number" 
+                        name="answer_weight[]" 
+                        class="form-control" 
+                        placeholder="Вес (-1.0 до 1.0)"
+                        step="0.1"
+                        min="-1"
+                        max="1"
+                        value="0.0"
+                        required
+                    >
+                </div>
+                <div class="form-group" style="width: auto;">
+                    <button type="button" class="btn btn-secondary btn-sm remove-answer-btn">Удалить</button>
+                </div>
+            </div>
+        `;
+        answersContainer.appendChild(answerItem);
+        
+        answerItem.querySelector('.remove-answer-btn').addEventListener('click', function() {
+            answerItem.remove();
+        });
+    });
+    
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-answer-btn')) {
+            e.target.closest('.answer-item').remove();
+        }
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}
+

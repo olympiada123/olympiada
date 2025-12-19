@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Прохождение теста - {{ exam_session.olympiad_subject.olympiad.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="about-page">
+        <div class="exam-header">
+            <h1 class="about-page-title">{{ exam_session.olympiad_subject.olympiad.name }}</h1>
+            <div class="exam-info">
+                <span class="exam-subject">Предмет: {{ exam_session.olympiad_subject.subject.name }}</span>
+                <span class="exam-progress">Вопрос {{ current_index }} из {{ total_questions }}</span>
+            </div>
+        </div>
+
+        <section class="about-section">
+            <div class="detail-section-card">
+                <form method="post" action="{% url 'save_answer' exam_session.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="question_id" value="{{ question.id }}">
+                    
+                    <div class="question-block">
+                        <h2 class="question-title">Вопрос {{ current_index }}</h2>
+                        <p class="question-text">{{ question.text }}</p>
+                        {% if question.description %}
+                        <p class="question-description">{{ question.description }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="answers-block">
+                        <h3 class="answers-title">Выберите ответ(ы):</h3>
+                        <div class="answers-list">
+                            {% for answer in answers %}
+                            <div class="answer-option">
+                                <input 
+                                    type="checkbox" 
+                                    name="answers" 
+                                    id="answer_{{ answer.id }}" 
+                                    value="{{ answer.id }}"
+                                    {% if answer.id in selected_answer_ids %}checked{% endif %}
+                                >
+                                <label for="answer_{{ answer.id }}" class="answer-label">
+                                    {{ answer.text }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="exam-actions">
+                        {% if current_index > 1 %}
+                        <button type="submit" name="action" value="previous" class="btn btn-secondary">Назад</button>
+                        {% endif %}
+                        <div style="flex: 1;"></div>
+                        {% if current_index < total_questions %}
+                        <button type="submit" name="action" value="next" class="btn btn-primary">Следующий вопрос</button>
+                        {% else %}
+                        <button type="submit" name="action" value="submit" class="btn btn-primary">Завершить тест</button>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Управление вопросами - {{ olympiad.name }} - {{ subject.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="about-page">
+        <h1 class="about-page-title">Управление вопросами</h1>
+
+        <section class="about-section">
+            <div class="detail-section-card">
+                <a href="{% url 'olympiad_detail' olympiad.id %}" class="back-link">← Назад к олимпиаде</a>
+                
+                <div style="margin-top: 1.5rem;">
+                    <h2 class="section-title">{{ olympiad.name }} - {{ subject.name }}</h2>
+                    <a href="{% url 'create_question' olympiad.id subject.id %}" class="btn btn-primary">Добавить вопрос</a>
+                </div>
+
+                {% if questions %}
+                <div style="margin-top: 2rem;">
+                    <h3 class="section-subtitle">Вопросы ({{ questions.count }})</h3>
+                    <div class="questions-list">
+                        {% for question in questions %}
+                        <div class="question-item">
+                            <div class="question-info">
+                                <h4 class="question-title">Вопрос #{{ question.order }}: {{ question.text|truncatewords:10 }}</h4>
+                                <div class="question-meta">
+                                    <span class="question-meta-item">Метод оценки: {{ question.get_scoring_method_display }}</span>
+                                    <span class="question-meta-item">Баллы: {{ question.min_points }} - {{ question.max_points }}</span>
+                                    <span class="question-meta-item">Сложность: {{ question.get_difficulty_level_display }}</span>
+                                </div>
+                            </div>
+                            <div class="question-actions">
+                                <a href="#" class="btn btn-secondary btn-sm">Редактировать</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="empty-state" style="margin-top: 2rem;">
+                    <p class="empty-state-text">Вопросы еще не добавлены.</p>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+

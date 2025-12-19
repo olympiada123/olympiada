@@ -153,6 +153,24 @@
                 </form>
             </div>
         </section>
+
+        {% if olympiad_subjects %}
+        <section class="about-section">
+            <div class="detail-section-card">
+                <h2 class="section-title">Управление вопросами</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Выберите предмет для управления вопросами теста</p>
+                <div class="subjects-list">
+                    {% for olympiad_subject in olympiad_subjects %}
+                    <div class="subject-card">
+                        <span class="subject-icon">📖</span>
+                        <span class="subject-name">{{ olympiad_subject.subject.name }}</span>
+                        <a href="{% url 'manage_questions' olympiad.id olympiad_subject.subject.id %}" class="btn btn-primary btn-sm" style="margin-left: auto;">Управление вопросами</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

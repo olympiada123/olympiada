@@ -36,4 +36,11 @@ urlpatterns = [
     path('olympiads/<int:olympiad_id>/register/', views.register_for_olympiad, name='register_for_olympiad'),
     path('olympiads/create/', views.create_olympiad, name='create_olympiad'),
     path('olympiads/<int:olympiad_id>/edit/', views.edit_olympiad, name='edit_olympiad'),
+    path('olympiads/<int:olympiad_id>/subjects/<int:subject_id>/questions/', views.manage_questions, name='manage_questions'),
+    path('olympiads/<int:olympiad_id>/subjects/<int:subject_id>/questions/create/', views.create_question, name='create_question'),
+    path('olympiads/<int:olympiad_id>/subjects/<int:subject_id>/start/', views.start_exam, name='start_exam'),
+    path('exam/<int:session_id>/', views.take_exam, name='take_exam'),
+    path('exam/<int:session_id>/save/', views.save_answer, name='save_answer'),
+    path('exam/<int:session_id>/submit/', views.submit_exam, name='submit_exam'),
+    path('exam/<int:session_id>/results/', views.exam_results, name='exam_results'),
 ]

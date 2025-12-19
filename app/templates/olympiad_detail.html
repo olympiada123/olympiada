@@ -53,6 +53,13 @@
                     <div class="subject-card">
                         <span class="subject-icon">📖</span>
                         <span class="subject-name">{{ subject.name }}</span>
+                        {% if user.is_authenticated %}
+                            {% if user.is_staff or user.is_superuser %}
+                                <a href="{% url 'manage_questions' olympiad.id subject.id %}" class="btn btn-secondary btn-sm" style="margin-left: auto;">Управление вопросами</a>
+                            {% elif is_registered and subject.id in registered_subject_ids %}
+                                <a href="{% url 'start_exam' olympiad.id subject.id %}" class="btn btn-primary btn-sm" style="margin-left: auto;">Начать тест</a>
+                            {% endif %}
+                        {% endif %}
                     </div>
                     {% endfor %}
                 </div>

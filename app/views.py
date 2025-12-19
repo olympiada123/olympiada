@@ -1,12 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils import timezone
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.db import models
-from .models import ContactForm, Olympiad, Subject, CustomUser, StudentRegistration, OlympiadSubject
+from .models import ContactForm, Olympiad, Subject, CustomUser, StudentRegistration, OlympiadSubject, Question, Answer, ExamSession, StudentAnswer, Result
 
 
 def index(request):
@@ -143,16 +143,20 @@ def olympiad_detail(request, olympiad_id):
         status = 'upcoming'
         status_display = 'Скоро'
     
-    subjects_list = [olympiad_subject.subject for olympiad_subject in olympiad.subjects.filter(is_active=True)]
+    olympiad_subjects = olympiad.subjects.filter(is_active=True).select_related('subject')
+    subjects_list = [os.subject for os in olympiad_subjects]
     
     is_registered = False
     registration = None
+    registered_subject_ids = []
     if request.user.is_authenticated:
         registration = StudentRegistration.objects.filter(
             student=request.user,
             olympiad=olympiad
-        ).first()
+        ).prefetch_related('subjects').first()
         is_registered = registration is not None
+        if registration:
+            registered_subject_ids = [s.id for s in registration.subjects.all()]
     
     can_register = False
     if request.user.is_authenticated and not request.user.is_superuser and not request.user.is_staff:
@@ -167,9 +171,11 @@ def olympiad_detail(request, olympiad_id):
         'status': status,
         'status_display': status_display,
         'subjects': subjects_list,
+        'olympiad_subjects': olympiad_subjects,
         'is_registered': is_registered,
         'registration': registration,
         'can_register': can_register,
+        'registered_subject_ids': registered_subject_ids,
     }
     
     return render(request, 'olympiad_detail.html', context)
@@ -471,7 +477,7 @@ def profile_view(request):
         elif curator_status_filter == 'inactive':
             curator_olympiads_query = curator_olympiads_query.filter(is_active=False)
         
-        curator_olympiads = curator_olympiads_query.order_by('-is_active', '-created_at')
+        curator_olympiads = curator_olympiads_query.prefetch_related('subjects__subject').order_by('-is_active', '-created_at')
     
     if user.is_superuser:
         search_query = request.GET.get('user_search', '').strip()
@@ -767,11 +773,381 @@ def edit_olympiad(request, olympiad_id):
     
     all_subjects = Subject.objects.filter(is_active=True).order_by('name')
     current_subjects = [os.subject.id for os in olympiad.subjects.filter(is_active=True)]
+    olympiad_subjects = olympiad.subjects.filter(is_active=True).select_related('subject')
     
     context = {
         'olympiad': olympiad,
         'subjects': all_subjects,
         'current_subjects': current_subjects,
+        'olympiad_subjects': olympiad_subjects,
     }
     return render(request, 'edit_olympiad.html', context)
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff or u.is_superuser)
+def manage_questions(request, olympiad_id, subject_id):
+    """
+    Управление вопросами для предмета олимпиады (для кураторов).
+    
+    Args:
+        request: HTTP запрос.
+        olympiad_id: ID олимпиады.
+        subject_id: ID предмета.
+    
+    Returns:
+        HttpResponse: Рендеринг шаблона manage_questions.html.
+    """
+    olympiad = get_object_or_404(Olympiad, id=olympiad_id)
+    subject = get_object_or_404(Subject, id=subject_id)
+    olympiad_subject = get_object_or_404(OlympiadSubject, olympiad=olympiad, subject=subject)
+    
+    questions = Question.objects.filter(olympiad_subject=olympiad_subject, is_active=True).order_by('order')
+    
+    context = {
+        'olympiad': olympiad,
+        'subject': subject,
+        'olympiad_subject': olympiad_subject,
+        'questions': questions,
+    }
+    return render(request, 'manage_questions.html', context)
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff or u.is_superuser)
+def create_question(request, olympiad_id, subject_id):
+    """
+    Создание нового вопроса для предмета олимпиады.
+    
+    Args:
+        request: HTTP запрос. Может содержать POST данные с данными вопроса.
+        olympiad_id: ID олимпиады.
+        subject_id: ID предмета.
+    
+    Returns:
+        HttpResponse: Рендеринг шаблона create_question.html или редирект.
+    """
+    olympiad = get_object_or_404(Olympiad, id=olympiad_id)
+    subject = get_object_or_404(Subject, id=subject_id)
+    olympiad_subject = get_object_or_404(OlympiadSubject, olympiad=olympiad, subject=subject)
+    
+    if request.method == 'POST':
+        text = request.POST.get('text')
+        description = request.POST.get('description', '')
+        scoring_method = request.POST.get('scoring_method', 'weighted_sum')
+        base_points = request.POST.get('base_points', 1.0)
+        max_points = request.POST.get('max_points', 1.0)
+        min_points = request.POST.get('min_points', 0.0)
+        difficulty_level = request.POST.get('difficulty_level', 'intermediate')
+        order = request.POST.get('order', 0)
+        
+        if not text:
+            messages.error(request, 'Текст вопроса обязателен.')
+            return redirect('create_question', olympiad_id=olympiad_id, subject_id=subject_id)
+        
+        question = Question.objects.create(
+            olympiad_subject=olympiad_subject,
+            text=text,
+            description=description,
+            scoring_method=scoring_method,
+            base_points=base_points,
+            max_points=max_points,
+            min_points=min_points,
+            difficulty_level=difficulty_level,
+            order=order
+        )
+        
+        answer_texts = request.POST.getlist('answer_text[]')
+        answer_weights = request.POST.getlist('answer_weight[]')
+        
+        for i, answer_text in enumerate(answer_texts):
+            if answer_text.strip():
+                weight = float(answer_weights[i]) if i < len(answer_weights) and answer_weights[i] else 0.0
+                Answer.objects.create(
+                    question=question,
+                    text=answer_text.strip(),
+                    correctness_weight=weight,
+                    order=i
+                )
+        
+        messages.success(request, f'Вопрос успешно создан.')
+        return redirect('manage_questions', olympiad_id=olympiad_id, subject_id=subject_id)
+    
+    context = {
+        'olympiad': olympiad,
+        'subject': subject,
+        'olympiad_subject': olympiad_subject,
+    }
+    return render(request, 'create_question.html', context)
+
+
+@login_required
+def start_exam(request, olympiad_id, subject_id):
+    """
+    Начать прохождение теста по предмету олимпиады.
+    
+    Args:
+        request: HTTP запрос.
+        olympiad_id: ID олимпиады.
+        subject_id: ID предмета.
+    
+    Returns:
+        HttpResponse: Рендеринг страницы теста или редирект.
+    """
+    if request.user.is_superuser or request.user.is_staff:
+        messages.error(request, 'Кураторы и администраторы не могут проходить тесты.')
+        return redirect('olympiad_detail', olympiad_id=olympiad_id)
+    
+    olympiad = get_object_or_404(Olympiad, id=olympiad_id)
+    subject = get_object_or_404(Subject, id=subject_id)
+    olympiad_subject = get_object_or_404(OlympiadSubject, olympiad=olympiad, subject=subject)
+    
+    registration = StudentRegistration.objects.filter(
+        student=request.user,
+        olympiad=olympiad,
+        subjects=subject
+    ).first()
+    
+    if not registration:
+        messages.error(request, 'Вы не зарегистрированы на этот предмет олимпиады.')
+        return redirect('olympiad_detail', olympiad_id=olympiad_id)
+    
+    now = timezone.now()
+    if olympiad.start_date > now or olympiad.end_date < now:
+        messages.error(request, 'Олимпиада сейчас не проводится.')
+        return redirect('olympiad_detail', olympiad_id=olympiad_id)
+    
+    existing_session = ExamSession.objects.filter(
+        student=request.user,
+        olympiad_subject=olympiad_subject,
+        registration=registration
+    ).order_by('-attempt_number').first()
+    
+    attempt_number = 1
+    if existing_session:
+        attempt_number = existing_session.attempt_number + 1
+    
+    exam_session = ExamSession.objects.create(
+        student=request.user,
+        olympiad_subject=olympiad_subject,
+        registration=registration,
+        attempt_number=attempt_number,
+        status='in_progress',
+        started_at=now
+    )
+    
+    questions = Question.objects.filter(
+        olympiad_subject=olympiad_subject,
+        is_active=True
+    ).order_by('order')
+    
+    if not questions.exists():
+        messages.error(request, 'Для этого предмета еще не добавлены вопросы.')
+        return redirect('olympiad_detail', olympiad_id=olympiad_id)
+    
+    question_order = [q.id for q in questions]
+    max_score = sum(float(q.max_points) for q in questions)
+    
+    exam_session.question_order = question_order
+    exam_session.max_score = max_score
+    exam_session.save()
+    
+    exam_session.start_test()
+    
+    return redirect('take_exam', session_id=exam_session.id)
+
+
+@login_required
+def take_exam(request, session_id):
+    """
+    Страница прохождения теста.
+    
+    Args:
+        request: HTTP запрос.
+        session_id: ID сессии экзамена.
+    
+    Returns:
+        HttpResponse: Рендеринг страницы теста.
+    """
+    exam_session = get_object_or_404(ExamSession, id=session_id)
+    
+    if exam_session.student != request.user:
+        messages.error(request, 'У вас нет доступа к этой сессии.')
+        return redirect('profile')
+    
+    if exam_session.status not in ['in_progress', 'paused']:
+        messages.info(request, 'Эта сессия уже завершена.')
+        return redirect('exam_results', session_id=session_id)
+    
+    if not exam_session.question_order:
+        messages.error(request, 'Вопросы не найдены.')
+        return redirect('olympiad_detail', olympiad_id=exam_session.olympiad_subject.olympiad.id)
+    
+    current_index = exam_session.current_question_index
+    if current_index >= len(exam_session.question_order):
+        return redirect('submit_exam', session_id=session_id)
+    
+    question_id = exam_session.question_order[current_index]
+    question = get_object_or_404(Question, id=question_id)
+    answers = Answer.objects.filter(question=question, is_active=True).order_by('order')
+    
+    existing_answer = StudentAnswer.objects.filter(
+        exam_session=exam_session,
+        question=question
+    ).first()
+    
+    selected_answer_ids = []
+    if existing_answer:
+        selected_answer_ids = [a.id for a in existing_answer.selected_answers.all()]
+    
+    context = {
+        'exam_session': exam_session,
+        'question': question,
+        'answers': answers,
+        'selected_answer_ids': selected_answer_ids,
+        'current_index': current_index + 1,
+        'total_questions': len(exam_session.question_order),
+    }
+    return render(request, 'take_exam.html', context)
+
+
+@login_required
+def save_answer(request, session_id):
+    """
+    Сохранить ответ студента на вопрос.
+    
+    Args:
+        request: HTTP запрос. Содержит POST данные с выбранными ответами.
+        session_id: ID сессии экзамена.
+    
+    Returns:
+        HttpResponse: Редирект на следующий вопрос или завершение теста.
+    """
+    exam_session = get_object_or_404(ExamSession, id=session_id)
+    
+    if exam_session.student != request.user:
+        messages.error(request, 'У вас нет доступа к этой сессии.')
+        return redirect('profile')
+    
+    if exam_session.status not in ['in_progress', 'paused']:
+        messages.info(request, 'Эта сессия уже завершена.')
+        return redirect('exam_results', session_id=session_id)
+    
+    if request.method == 'POST':
+        question_id = request.POST.get('question_id')
+        selected_answer_ids = request.POST.getlist('answers')
+        
+        question = get_object_or_404(Question, id=question_id)
+        
+        student_answer, created = StudentAnswer.objects.get_or_create(
+            exam_session=exam_session,
+            question=question
+        )
+        
+        student_answer.selected_answers.clear()
+        if selected_answer_ids:
+            selected_answers = Answer.objects.filter(id__in=selected_answer_ids)
+            student_answer.selected_answers.set(selected_answers)
+        
+        student_answer.check_answer()
+        
+        action = request.POST.get('action', 'next')
+        
+        if action == 'next':
+            exam_session.current_question_index += 1
+            exam_session.questions_answered_count = StudentAnswer.objects.filter(exam_session=exam_session).count()
+            exam_session.save()
+            
+            if exam_session.current_question_index >= len(exam_session.question_order):
+                return redirect('submit_exam', session_id=session_id)
+            else:
+                return redirect('take_exam', session_id=session_id)
+        elif action == 'previous':
+            if exam_session.current_question_index > 0:
+                exam_session.current_question_index -= 1
+                exam_session.save()
+            return redirect('take_exam', session_id=session_id)
+        elif action == 'submit':
+            return redirect('submit_exam', session_id=session_id)
+    
+    return redirect('take_exam', session_id=session_id)
+
+
+@login_required
+def submit_exam(request, session_id):
+    """
+    Завершить тест и рассчитать результаты.
+    
+    Args:
+        request: HTTP запрос.
+        session_id: ID сессии экзамена.
+    
+    Returns:
+        HttpResponse: Редирект на страницу результатов.
+    """
+    exam_session = get_object_or_404(ExamSession, id=session_id)
+    
+    if exam_session.student != request.user:
+        messages.error(request, 'У вас нет доступа к этой сессии.')
+        return redirect('profile')
+    
+    if exam_session.status == 'completed':
+        return redirect('exam_results', session_id=session_id)
+    
+    now = timezone.now()
+    exam_session.status = 'completed'
+    exam_session.completed_at = now
+    exam_session.calculate_score()
+    exam_session.save()
+    
+    registration = exam_session.registration
+    olympiad = exam_session.olympiad_subject.olympiad
+    
+    result, created = Result.objects.get_or_create(
+        student=request.user,
+        olympiad=olympiad
+    )
+    
+    all_sessions = ExamSession.objects.filter(
+        student=request.user,
+        olympiad_subject__olympiad=olympiad,
+        status='completed'
+    )
+    
+    total_score = sum(float(session.final_score) for session in all_sessions)
+    max_possible = sum(float(session.max_score) for session in all_sessions)
+    
+    result.total_score = total_score
+    result.max_possible_score = max_possible
+    result.calculate_percentage()
+    result.save()
+    
+    return redirect('exam_results', session_id=session_id)
+
+
+@login_required
+def exam_results(request, session_id):
+    """
+    Отобразить результаты прохождения теста.
+    
+    Args:
+        request: HTTP запрос.
+        session_id: ID сессии экзамена.
+    
+    Returns:
+        HttpResponse: Рендеринг страницы результатов.
+    """
+    exam_session = get_object_or_404(ExamSession, id=session_id)
+    
+    if exam_session.student != request.user:
+        messages.error(request, 'У вас нет доступа к этой сессии.')
+        return redirect('profile')
+    
+    student_answers = StudentAnswer.objects.filter(exam_session=exam_session).select_related('question').prefetch_related('selected_answers')
+    
+    context = {
+        'exam_session': exam_session,
+        'student_answers': student_answers,
+    }
+    return render(request, 'exam_results.html', context)
 

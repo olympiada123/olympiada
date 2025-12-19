@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Результаты теста - {{ exam_session.olympiad_subject.olympiad.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="about-page">
+        <h1 class="about-page-title">Результаты теста</h1>
+
+        <section class="about-section">
+            <div class="detail-section-card">
+                <a href="{% url 'olympiad_detail' exam_session.olympiad_subject.olympiad.id %}" class="back-link">← Назад к олимпиаде</a>
+                
+                <div class="results-summary" style="margin-top: 2rem;">
+                    <h2 class="section-title">{{ exam_session.olympiad_subject.olympiad.name }} - {{ exam_session.olympiad_subject.subject.name }}</h2>
+                    
+                    <div class="results-stats">
+                        <div class="result-stat-card">
+                            <div class="stat-label">Набрано баллов</div>
+                            <div class="stat-value">{{ exam_session.final_score|floatformat:2 }}</div>
+                        </div>
+                        <div class="result-stat-card">
+                            <div class="stat-label">Максимальный балл</div>
+                            <div class="stat-value">{{ exam_session.max_score|floatformat:2 }}</div>
+                        </div>
+                        <div class="result-stat-card">
+                            <div class="stat-label">Процент выполнения</div>
+                            <div class="stat-value">
+                                {% if exam_session.max_score > 0 %}
+                                    {% widthratio exam_session.final_score exam_session.max_score 100 %}%
+                                {% else %}
+                                    0%
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if student_answers %}
+                <div class="answers-review" style="margin-top: 2rem;">
+                    <h3 class="section-subtitle">Детали ответов</h3>
+                    {% for student_answer in student_answers %}
+                    <div class="answer-review-item">
+                        <div class="answer-review-question">
+                            <h4>Вопрос {{ forloop.counter }}</h4>
+                            <p>{{ student_answer.question.text }}</p>
+                        </div>
+                        <div class="answer-review-answer">
+                            <strong>Ваш ответ:</strong>
+                            {% if student_answer.selected_answers.all %}
+                                <ul>
+                                    {% for answer in student_answer.selected_answers.all %}
+                                    <li>{{ answer.text }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>Ответ не выбран</p>
+                            {% endif %}
+                        </div>
+                        <div class="answer-review-score">
+                            <span class="score-label">Баллы:</span>
+                            <span class="score-value">{{ student_answer.points_earned|floatformat:2 }} / {{ student_answer.question.max_points|floatformat:2 }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
