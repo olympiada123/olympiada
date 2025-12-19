@@ -1590,6 +1590,13 @@ textarea.form-control {
     padding: 1.5rem;
     background: var(--bg-secondary);
     border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    user-select: none;
+    transition: var(--transition);
+}
+
+.rules-section-header:hover {
+    background: var(--bg-tertiary);
 }
 
 .rules-section-icon {
@@ -1604,8 +1611,42 @@ textarea.form-control {
     margin: 0;
 }
 
+.rules-section-toggle {
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: var(--primary-color);
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: var(--transition);
+    border-radius: 50%;
+    background: var(--bg-tertiary);
+    margin-left: auto;
+}
+
+.rules-section.active .rules-section-toggle {
+    transform: rotate(0deg);
+    background: var(--primary-color);
+    color: white;
+}
+
+.rules-section:not(.active) .rules-section-toggle {
+    transform: rotate(0deg);
+}
+
 .rules-content {
     padding: 1.5rem;
+    max-height: 5000px;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.rules-section:not(.active) .rules-content {
+    max-height: 0;
+    padding: 0 1.5rem;
 }
 
 .rule-item {
