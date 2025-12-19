@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from django.db import models
 from .models import ContactForm, Olympiad, Subject, CustomUser, StudentRegistration
 
 
@@ -304,19 +305,35 @@ def profile_view(request):
             except Exception as e:
                 messages.error(request, f'Ошибка при изменении роли: {str(e)}')
         
+        search_query = request.GET.get('user_search', '')
+        if search_query:
+            from django.urls import reverse
+            from urllib.parse import urlencode
+            return redirect(f"{reverse('profile')}?{urlencode({'user_search': search_query})}")
         return redirect('profile')
     
     registrations = StudentRegistration.objects.filter(student=user).select_related('olympiad').prefetch_related('subjects', 'olympiad__subjects__subject').order_by('-registered_at')
     
     all_users = None
+    search_query = None
     if user.is_superuser:
-        all_users = CustomUser.objects.all().order_by('last_name', 'first_name', 'username')
+        search_query = request.GET.get('user_search', '').strip()
+        if search_query:
+            all_users = CustomUser.objects.filter(
+                models.Q(username__icontains=search_query) |
+                models.Q(first_name__icontains=search_query) |
+                models.Q(last_name__icontains=search_query) |
+                models.Q(email__icontains=search_query)
+            ).order_by('last_name', 'first_name', 'username')
+        else:
+            all_users = CustomUser.objects.none()
     
     context = {
         'user': user,
         'role': role,
         'registrations': registrations,
         'all_users': all_users,
+        'search_query': search_query,
     }
     
     return render(request, 'profile.html', context)

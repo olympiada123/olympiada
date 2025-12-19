@@ -3077,6 +3077,48 @@ textarea.form-control {
     width: 100%;
 }
 
+.user-search-form {
+    margin-bottom: 2rem;
+}
+
+.user-search-wrapper {
+    display: flex;
+    gap: 0.75rem;
+    align-items: stretch;
+}
+
+.user-search-input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    border: 2px solid var(--border-color);
+    border-radius: 0.5rem;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: var(--transition);
+}
+
+.user-search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(75, 85, 99, 0.1);
+}
+
+.user-search-input::placeholder {
+    color: var(--text-secondary);
+}
+
+.user-search-btn {
+    flex-shrink: 0;
+    padding: 0.75rem 1.5rem;
+    white-space: nowrap;
+}
+
+.user-search-hint {
+    padding: 2rem 1rem;
+    text-align: center;
+}
+
 .users-list {
     display: flex;
     flex-direction: column;
@@ -3173,6 +3215,14 @@ textarea.form-control {
     .role-select {
         width: 100%;
         min-width: auto;
+    }
+
+    .user-search-wrapper {
+        flex-direction: column;
+    }
+
+    .user-search-btn {
+        width: 100%;
     }
 }
 
