@@ -121,7 +121,7 @@
                             {% elif item.status == 'finished' %}
                             <a href="#" class="btn btn-secondary">Посмотреть результаты</a>
                             {% endif %}
-                            <a href="#" class="btn btn-secondary">Подробнее</a>
+                            <a href="{% url 'olympiad_detail' item.olympiad.id %}" class="btn btn-secondary">Подробнее</a>
                         </div>
                     </div>
                 </div>

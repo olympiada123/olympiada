@@ -27,4 +27,5 @@ urlpatterns = [
     path('faq/', views.faq, name='faq'),
     path('rules/', views.rules, name='rules'),
     path('olympiads/', views.olympiads, name='olympiads'),
+    path('olympiads/<int:olympiad_id>/', views.olympiad_detail, name='olympiad_detail'),
 ]

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
 from .models import ContactForm, Olympiad, Subject
@@ -103,4 +103,40 @@ def olympiads(request):
     }
     
     return render(request, 'olympiads.html', context)
+
+
+def olympiad_detail(request, olympiad_id):
+    """
+    Отображает детальную информацию об олимпиаде.
+    
+    Args:
+        request: HTTP запрос.
+        olympiad_id: ID олимпиады для отображения.
+    
+    Returns:
+        HttpResponse: Рендеринг шаблона olympiad_detail.html с контекстом олимпиады.
+    """
+    olympiad = get_object_or_404(Olympiad, id=olympiad_id)
+    now = timezone.now()
+    
+    if olympiad.end_date < now:
+        status = 'finished'
+        status_display = 'Завершена'
+    elif olympiad.start_date <= now <= olympiad.end_date:
+        status = 'active'
+        status_display = 'Активна'
+    else:
+        status = 'upcoming'
+        status_display = 'Скоро'
+    
+    subjects_list = [olympiad_subject.subject for olympiad_subject in olympiad.subjects.filter(is_active=True)]
+    
+    context = {
+        'olympiad': olympiad,
+        'status': status,
+        'status_display': status_display,
+        'subjects': subjects_list,
+    }
+    
+    return render(request, 'olympiad_detail.html', context)
 

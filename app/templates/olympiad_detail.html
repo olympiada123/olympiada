@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ olympiad.name }} - Олимпиада{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="about-page">
+        <div class="olympiad-detail-header">
+            <a href="{% url 'olympiads' %}" class="back-link">← Назад к олимпиадам</a>
+            <h1 class="about-page-title">{{ olympiad.name }}</h1>
+            <span class="olympiad-status olympiad-status-{{ status }}">{{ status_display }}</span>
+            {% if olympiad.description %}
+            <p class="olympiad-description-text">{{ olympiad.description }}</p>
+            {% endif %}
+        </div>
+
+        <section class="about-section">
+
+            <div class="detail-section-card">
+                <h2 class="section-title">Информация об олимпиаде</h2>
+                <div class="olympiad-details-grid">
+                    <div class="olympiad-detail-card">
+                        <div class="detail-card-icon">📅</div>
+                        <div class="detail-card-content">
+                            <h3 class="detail-card-title">Дата проведения</h3>
+                            <p class="detail-card-value">{{ olympiad.start_date|date:"d.m.Y" }} - {{ olympiad.end_date|date:"d.m.Y" }}</p>
+                        </div>
+                    </div>
+
+                    <div class="olympiad-detail-card">
+                        <div class="detail-card-icon">📝</div>
+                        <div class="detail-card-content">
+                            <h3 class="detail-card-title">Регистрация</h3>
+                            <p class="detail-card-value">{{ olympiad.registration_start|date:"d.m.Y" }} - {{ olympiad.registration_end|date:"d.m.Y" }}</p>
+                        </div>
+                    </div>
+
+                    <div class="olympiad-detail-card">
+                        <div class="detail-card-icon">📚</div>
+                        <div class="detail-card-content">
+                            <h3 class="detail-card-title">Максимум предметов</h3>
+                            <p class="detail-card-value">{{ olympiad.max_subjects_per_student }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if subjects %}
+            <div class="detail-section-card">
+                <h2 class="section-title">Предметы олимпиады</h2>
+                <div class="subjects-list">
+                    {% for subject in subjects %}
+                    <div class="subject-card">
+                        <span class="subject-icon">📖</span>
+                        <span class="subject-name">{{ subject.name }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="detail-section-card detail-actions-card">
+                <div class="olympiad-detail-actions">
+                    {% if status == 'active' %}
+                    <a href="#" class="btn btn-primary btn-large">Зарегистрироваться</a>
+                    {% elif status == 'upcoming' %}
+                    <a href="#" class="btn btn-primary btn-large" disabled>Регистрация скоро откроется</a>
+                    {% elif status == 'finished' %}
+                    <a href="#" class="btn btn-secondary btn-large">Посмотреть результаты</a>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
