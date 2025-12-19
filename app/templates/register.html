@@ -5,12 +5,11 @@
 {% block content %}
 <div class="container">
     <div class="about-page">
-        <h1 class="about-page-title">Регистрация</h1>
-
         <section class="about-section">
             <div class="auth-card">
+                <h1 class="auth-title">Регистрация</h1>
                 <p class="auth-description">
-                    Создайте аккаунт для участия в олимпиадах. Заполните форму ниже, указав ваши данные и номер студенческого билета.
+                    Создайте аккаунт для участия в олимпиадах. Заполните форму ниже, указав ваши данные.
                 </p>
 
                 <form method="post" class="auth-form">
@@ -69,18 +68,6 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="id_student_id" class="form-label">Номер студенческого билета *</label>
-                        <input 
-                            type="text" 
-                            name="student_id" 
-                            id="id_student_id" 
-                            class="form-control" 
-                            required 
-                            placeholder="Введите номер студенческого билета"
-                        >
-                    </div>
-
-                    <div class="form-group">
                         <label for="id_password1" class="form-label">Пароль *</label>
                         <input 
                             type="password" 
@@ -115,7 +102,7 @@
                     </div>
 
                     <div class="form-group" style="margin-top: 2rem;">
-                        <button type="submit" class="btn btn-primary" style="width: 100%; max-width: 300px;">
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">
                             Зарегистрироваться
                         </button>
                     </div>
