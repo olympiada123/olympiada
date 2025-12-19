@@ -51,16 +51,25 @@ def olympiads(request):
     """
     Отображает страницу со списком олимпиад.
     
-    Получает активные олимпиады из базы данных, определяет их статус
-    на основе текущей даты и передает в шаблон вместе со списком предметов.
+    Получает активные или неактивные олимпиады из базы данных в зависимости от параметра show_past,
+    определяет их статус на основе текущей даты и передает в шаблон вместе со списком предметов.
     Автоматически деактивирует завершенные олимпиады.
+    
+    Args:
+        request: HTTP запрос. Может содержать GET параметр 'show_past' для отображения прошлых олимпиад.
     
     Returns:
         HttpResponse: Рендеринг шаблона olympiads.html с контекстом олимпиад и предметов.
     """
     now = timezone.now()
+    show_past = request.GET.get('show_past', 'false').lower() == 'true'
+    
     Olympiad.objects.filter(is_active=True, end_date__lt=now).update(is_active=False)
-    olympiads_list = Olympiad.objects.filter(is_active=True).prefetch_related('subjects__subject')
+    
+    if show_past:
+        olympiads_list = Olympiad.objects.filter(is_active=False).prefetch_related('subjects__subject').order_by('-end_date')
+    else:
+        olympiads_list = Olympiad.objects.filter(is_active=True).prefetch_related('subjects__subject')
     
     olympiads_with_status = []
     for olympiad in olympiads_list:
@@ -90,6 +99,7 @@ def olympiads(request):
     context = {
         'olympiads': olympiads_with_status,
         'subjects': all_subjects,
+        'show_past': show_past,
     }
     
     return render(request, 'olympiads.html', context)

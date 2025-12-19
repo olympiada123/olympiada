@@ -10,9 +10,21 @@
         <section class="about-section">
             <div class="olympiads-intro">
                 <p class="olympiads-intro-text">
+                    {% if show_past %}
+                    Просмотр завершенных олимпиад. Здесь вы можете ознакомиться с результатами и информацией о прошлых олимпиадах.
+                    {% else %}
                     Выберите олимпиаду для участия. Ознакомьтесь с описанием, датами проведения и доступными предметами. 
                     Регистрация на олимпиады открывается в указанные сроки.
+                    {% endif %}
                 </p>
+                <div class="olympiads-toggle">
+                    <a href="{% url 'olympiads' %}" class="olympiads-toggle-btn {% if not show_past %}active{% endif %}">
+                        Текущие олимпиады
+                    </a>
+                    <a href="?show_past=true" class="olympiads-toggle-btn {% if show_past %}active{% endif %}">
+                        Прошлые олимпиады
+                    </a>
+                </div>
             </div>
         </section>
 
