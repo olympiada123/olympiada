@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}Часто задаваемые вопросы - Олимпиада{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="about-page">
+        <h1 class="about-page-title">Часто задаваемые вопросы</h1>
+
+        <section class="about-section">
+            <div class="faq-intro">
+                <p style="color: var(--text-secondary); font-size: 1.05rem; line-height: 1.8; text-align: center; max-width: 800px; margin: 0 auto 3rem;">
+                    Здесь собраны ответы на наиболее часто задаваемые вопросы о платформе, регистрации и участии в олимпиадах. 
+                    Если вы не нашли ответ на свой вопрос, пожалуйста, свяжитесь с нами через форму обратной связи.
+                </p>
+            </div>
+        </section>
+
+        <section class="about-section">
+            <div class="faq-container">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span class="faq-icon">❓</span>
+                        <h3>Как зарегистрироваться на платформе?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Для регистрации перейдите на страницу регистрации, заполните форму с вашими данными, укажите номер студенческого билета и подтвердите email. После регистрации вы сможете выбрать интересующие вас олимпиады.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span class="faq-icon">❓</span>
+                        <h3>Можно ли участвовать в нескольких олимпиадах одновременно?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Да, вы можете зарегистрироваться на несколько олимпиад по разным предметам. Убедитесь, что время проведения олимпиад не совпадает, чтобы вы могли полноценно участвовать в каждой из них.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span class="faq-icon">❓</span>
+                        <h3>Как проходит олимпиада?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Олимпиада проходит в онлайн-формате. В назначенное время вы входите в систему, получаете доступ к заданиям и выполняете их в течение отведенного времени. Система автоматически отслеживает время и сохраняет ваши ответы.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span class="faq-icon">❓</span>
+                        <h3>Когда я узнаю результаты?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Результаты обрабатываются автоматически и становятся доступны сразу после завершения олимпиады. Вы можете просмотреть свои результаты в личном кабинете, а также увидеть свой рейтинг среди других участников.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span class="faq-icon">❓</span>
+                        <h3>Что делать, если я забыл пароль?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>На странице входа в систему есть функция восстановления пароля. Введите ваш email, и мы отправим вам инструкции по восстановлению доступа к аккаунту.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span class="faq-icon">❓</span>
+                        <h3>Можно ли использовать калькулятор или другие материалы?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Правила использования дополнительных материалов зависят от конкретной олимпиады. Подробная информация о разрешенных материалах указывается в описании каждой олимпиады перед началом регистрации.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span class="faq-icon">❓</span>
+                        <h3>Что делать при технических проблемах во время олимпиады?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Если у вас возникли технические проблемы, немедленно свяжитесь с технической поддержкой через форму обратной связи или по указанным контактам. Обязательно укажите номер студенческого билета и опишите проблему максимально подробно.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span class="faq-icon">❓</span>
+                        <h3>Как рассчитываются баллы?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Система оценки использует различные методы в зависимости от типа вопросов. Баллы могут начисляться за правильные ответы, частично правильные ответы, а также могут применяться штрафы за неправильные ответы. Подробная информация о системе оценки доступна в описании каждой олимпиады.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span class="faq-icon">❓</span>
+                        <h3>Можно ли изменить ответ после отправки?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>В большинстве случаев вы можете изменить ответ до окончания времени олимпиады. Однако после окончания времени или финальной отправки результатов изменения невозможны. Рекомендуем внимательно проверять ответы перед финальной отправкой.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span class="faq-icon">❓</span>
+                        <h3>Где можно получить сертификат об участии?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Сертификаты об участии и дипломы доступны в личном кабинете после завершения олимпиады. Вы можете скачать их в электронном виде. Информация о выдаче бумажных сертификатов публикуется отдельно для каждой олимпиады.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="about-section">
+            <div class="faq-cta">
+                <div class="about-card" style="text-align: center; padding: 2.5rem;">
+                    <h2 class="card-heading" style="margin-bottom: 1rem;">Не нашли ответ на свой вопрос?</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.8;">
+                        Свяжитесь с нами через форму обратной связи, и мы обязательно поможем вам
+                    </p>
+                    <a href="{% url 'contact_form' %}" class="btn btn-primary">Связаться с нами</a>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% load static %}
+<script src="{% static 'js/faq.js' %}"></script>
+{% endblock %}
+
