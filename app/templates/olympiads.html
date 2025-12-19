@@ -17,7 +17,42 @@
         </section>
 
         <section class="about-section">
-            <div class="olympiads-container">
+            <div class="olympiads-filters">
+                <div class="search-box">
+                    <input 
+                        type="text" 
+                        id="olympiad-search" 
+                        class="search-input" 
+                        placeholder="Поиск по названию или описанию..."
+                    >
+                    <span class="search-icon">🔍</span>
+                </div>
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label for="status-filter" class="filter-label">Статус:</label>
+                        <select id="status-filter" class="filter-select">
+                            <option value="all">Все</option>
+                            <option value="active">Активна</option>
+                            <option value="upcoming">Скоро</option>
+                            <option value="finished">Завершена</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="sort-filter" class="filter-label">Сортировка:</label>
+                        <select id="sort-filter" class="filter-select">
+                            <option value="date-desc">По дате (новые)</option>
+                            <option value="date-asc">По дате (старые)</option>
+                            <option value="name-asc">По названию (А-Я)</option>
+                            <option value="name-desc">По названию (Я-А)</option>
+                        </select>
+                    </div>
+                    <button id="reset-filters" class="btn btn-secondary">Сбросить</button>
+                </div>
+            </div>
+            <div class="olympiads-results-info">
+                <span id="results-count">Найдено: <strong>3</strong> олимпиад</span>
+            </div>
+            <div class="olympiads-container" id="olympiads-container">
                 <div class="olympiad-card">
                     <div class="olympiad-header">
                         <div class="olympiad-title-section">
@@ -140,6 +175,11 @@
                     </div>
                 </div>
             </div>
+            <div class="pagination-container" id="pagination-container">
+                <div class="pagination" id="pagination">
+                    <!-- Пагинация будет добавлена через JavaScript -->
+                </div>
+            </div>
         </section>
     </div>
 </div>
@@ -147,6 +187,6 @@
 
 {% block extra_js %}
 {% load static %}
-<script src="{% static 'js/about.js' %}"></script>
+<script src="{% static 'js/olympiads.js' %}"></script>
 {% endblock %}
 
