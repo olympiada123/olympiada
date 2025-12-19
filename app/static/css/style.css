@@ -2617,6 +2617,60 @@ textarea.form-control {
     color: var(--text-secondary);
 }
 
+.password-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-input-wrapper .form-control {
+    padding-right: 3rem;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    transition: var(--transition);
+    outline: none;
+}
+
+.password-toggle:hover {
+    color: var(--primary-color);
+}
+
+.password-toggle:focus {
+    color: var(--primary-color);
+}
+
+.password-toggle-icon {
+    width: 20px;
+    height: 20px;
+    user-select: none;
+    pointer-events: none;
+    transition: var(--transition);
+    display: block;
+}
+
+.password-toggle-icon-hidden {
+    display: none;
+}
+
+.password-toggle.active .password-toggle-icon:not(.password-toggle-icon-hidden) {
+    display: none;
+}
+
+.password-toggle.active .password-toggle-icon-hidden {
+    display: block;
+}
+
 .form-help-text {
     display: block;
     font-size: 0.875rem;
