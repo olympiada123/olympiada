@@ -8,29 +8,38 @@
         <h1 class="about-page-title">Личный кабинет</h1>
 
         <section class="about-section">
-            <div class="detail-section-card">
-                <h2 class="section-title">Личная информация</h2>
-                <div class="profile-info-grid">
-                    <div class="profile-info-item">
-                        <span class="profile-info-label">Имя:</span>
-                        <span class="profile-info-value">{{ user.first_name|default:"Не указано" }}</span>
-                    </div>
-                    <div class="profile-info-item">
-                        <span class="profile-info-label">Фамилия:</span>
-                        <span class="profile-info-value">{{ user.last_name|default:"Не указано" }}</span>
-                    </div>
-                    <div class="profile-info-item">
-                        <span class="profile-info-label">Роль:</span>
-                        <span class="profile-info-value profile-role profile-role-{% if role == 'Администратор' %}admin{% elif role == 'Куратор' %}curator{% else %}student{% endif %}">{{ role }}</span>
-                    </div>
-                    <div class="profile-info-item">
-                        <span class="profile-info-label">Дата регистрации:</span>
-                        <span class="profile-info-value">{{ user.created_at|date:"d.m.Y" }}</span>
+            <div class="profile-layout">
+                <div class="detail-section-card profile-info-card">
+                    <h2 class="section-title">Личная информация</h2>
+                    <div class="profile-info-compact">
+                        <div class="profile-info-card-item">
+                            <div class="profile-info-content">
+                                <span class="profile-info-label">Имя</span>
+                                <span class="profile-info-value">{{ user.first_name|default:"Не указано" }}</span>
+                            </div>
+                        </div>
+                        <div class="profile-info-card-item">
+                            <div class="profile-info-content">
+                                <span class="profile-info-label">Фамилия</span>
+                                <span class="profile-info-value">{{ user.last_name|default:"Не указано" }}</span>
+                            </div>
+                        </div>
+                        <div class="profile-info-card-item">
+                            <div class="profile-info-content">
+                                <span class="profile-info-label">Роль</span>
+                                <span class="profile-info-value profile-role profile-role-{% if role == 'Администратор' %}admin{% elif role == 'Куратор' %}curator{% else %}student{% endif %}">{{ role }}</span>
+                            </div>
+                        </div>
+                        <div class="profile-info-card-item">
+                            <div class="profile-info-content">
+                                <span class="profile-info-label">Дата регистрации</span>
+                                <span class="profile-info-value">{{ user.created_at|date:"d.m.Y" }}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="detail-section-card">
+                <div class="detail-section-card profile-olympiads-card">
                 <h2 class="section-title">Мои олимпиады</h2>
                 {% if registrations %}
                 <div class="registrations-list">
@@ -67,6 +76,7 @@
                     <a href="{% url 'olympiads' %}" class="btn btn-primary">Посмотреть олимпиады</a>
                 </div>
                 {% endif %}
+                </div>
             </div>
         </section>
     </div>
