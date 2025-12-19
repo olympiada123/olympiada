@@ -278,6 +278,45 @@ def profile_view(request):
         role = 'Студент'
     
     if request.method == 'POST' and user.is_superuser:
+        if request.POST.get('action') == 'update_contact_form_status':
+            form_id = request.POST.get('form_id')
+            new_status = request.POST.get('status')
+            
+            if not form_id:
+                messages.error(request, 'Ошибка: не указан ID формы.')
+                status_filter = request.GET.get('status_filter', '')
+                if status_filter:
+                    from django.urls import reverse
+                    from urllib.parse import urlencode
+                    return redirect(f"{reverse('profile')}?{urlencode({'status_filter': status_filter})}")
+                return redirect('profile')
+            
+            if not new_status:
+                messages.error(request, 'Ошибка: не указан статус.')
+                status_filter = request.GET.get('status_filter', '')
+                if status_filter:
+                    from django.urls import reverse
+                    from urllib.parse import urlencode
+                    return redirect(f"{reverse('profile')}?{urlencode({'status_filter': status_filter})}")
+                return redirect('profile')
+            
+            try:
+                contact_form = ContactForm.objects.get(id=form_id)
+                contact_form.status = new_status
+                contact_form.save()
+                messages.success(request, 'Статус формы обратной связи успешно обновлен.')
+            except ContactForm.DoesNotExist:
+                messages.error(request, 'Форма обратной связи не найдена.')
+            except Exception as e:
+                messages.error(request, f'Ошибка при обновлении статуса: {str(e)}')
+            
+            status_filter = request.GET.get('status_filter', '')
+            if status_filter:
+                from django.urls import reverse
+                from urllib.parse import urlencode
+                return redirect(f"{reverse('profile')}?{urlencode({'status_filter': status_filter})}")
+            return redirect('profile')
+        
         target_user_id = request.POST.get('user_id')
         new_role = request.POST.get('role')
         
@@ -316,6 +355,9 @@ def profile_view(request):
     
     all_users = None
     search_query = None
+    contact_forms = None
+    status_filter = None
+    
     if user.is_superuser:
         search_query = request.GET.get('user_search', '').strip()
         if search_query:
@@ -327,6 +369,9 @@ def profile_view(request):
             ).order_by('last_name', 'first_name', 'username')
         else:
             all_users = CustomUser.objects.none()
+        
+        status_filter = request.GET.get('status_filter', '')
+        contact_forms = ContactForm.objects.all().order_by('-created_at')
     
     context = {
         'user': user,
@@ -334,6 +379,8 @@ def profile_view(request):
         'registrations': registrations,
         'all_users': all_users,
         'search_query': search_query,
+        'contact_forms': contact_forms,
+        'status_filter': status_filter,
     }
     
     return render(request, 'profile.html', context)

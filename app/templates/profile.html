@@ -146,7 +146,142 @@
                 {% endif %}
             </div>
         </section>
+
+        {% if user.is_superuser and contact_forms is not None %}
+        <section class="about-section">
+            <div class="detail-section-card">
+                <h2 class="section-title">Формы обратной связи</h2>
+                <div class="contact-forms-management">
+                    <div class="contact-forms-filters">
+                        <select name="status_filter" class="status-filter-select" id="contactFormStatusFilter">
+                            <option value="">Все статусы</option>
+                            <option value="not_processed" {% if status_filter == 'not_processed' %}selected{% endif %}>Не обработана</option>
+                            <option value="in_progress" {% if status_filter == 'in_progress' %}selected{% endif %}>В обработке</option>
+                            <option value="reviewed" {% if status_filter == 'reviewed' %}selected{% endif %}>Рассмотрена</option>
+                        </select>
+                    </div>
+                    
+                    <div class="contact-forms-list" id="contactFormsList">
+                        {% if contact_forms %}
+                            {% for form in contact_forms %}
+                            <div class="contact-form-item" data-status="{{ form.status }}" data-form-id="{{ form.id }}">
+                                <div class="contact-form-item-header">
+                                    <div class="contact-form-item-info">
+                                        <h3 class="contact-form-item-subject">{{ form.subject }}</h3>
+                                        <div class="contact-form-item-meta">
+                                            <span class="contact-form-item-name">{{ form.name }}</span>
+                                            <span class="contact-form-item-email">{{ form.email }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="contact-form-item-status">
+                                        <span class="contact-form-status contact-form-status-{{ form.status }}">
+                                            {{ form.get_status_display }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="contact-form-item-dates">
+                                    <span class="contact-form-date">Отправлено: {{ form.created_at|date:"d.m.Y H:i" }}</span>
+                                    <span class="contact-form-date">Изменено: {{ form.updated_at|date:"d.m.Y H:i" }}</span>
+                                    {% if form.status == 'reviewed' %}
+                                    <span class="contact-form-date">Завершено: {{ form.updated_at|date:"d.m.Y H:i" }}</span>
+                                    {% endif %}
+                                </div>
+                                <button 
+                                    type="button" 
+                                    class="btn btn-secondary btn-sm view-contact-form-btn" 
+                                    data-form-id="{{ form.id }}"
+                                    data-form-name="{{ form.name }}"
+                                    data-form-email="{{ form.email }}"
+                                    data-form-subject="{{ form.subject }}"
+                                    data-form-message="{{ form.message }}"
+                                    data-form-status="{{ form.status }}"
+                                    data-form-created="{{ form.created_at|date:'d.m.Y H:i' }}"
+                                    data-form-updated="{{ form.updated_at|date:'d.m.Y H:i' }}"
+                                >
+                                    Просмотр
+                                </button>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-state">
+                                <p class="empty-state-text">Формы обратной связи не найдены.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% endif %}
     </div>
 </div>
+
+{% if user.is_superuser %}
+<div id="contactFormModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Детали формы обратной связи</h2>
+            <button type="button" class="modal-close" aria-label="Закрыть">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="contact-form-details">
+                <div class="contact-form-detail-item">
+                    <span class="contact-form-detail-label">Имя:</span>
+                    <span class="contact-form-detail-value" id="modal-form-name"></span>
+                </div>
+                <div class="contact-form-detail-item">
+                    <span class="contact-form-detail-label">Email:</span>
+                    <span class="contact-form-detail-value" id="modal-form-email"></span>
+                </div>
+                <div class="contact-form-detail-item">
+                    <span class="contact-form-detail-label">Тема:</span>
+                    <span class="contact-form-detail-value" id="modal-form-subject"></span>
+                </div>
+                <div class="contact-form-detail-item">
+                    <span class="contact-form-detail-label">Сообщение:</span>
+                    <div class="contact-form-detail-message" id="modal-form-message"></div>
+                </div>
+                <div class="contact-form-detail-item">
+                    <span class="contact-form-detail-label">Дата отправления:</span>
+                    <span class="contact-form-detail-value" id="modal-form-created"></span>
+                </div>
+                <div class="contact-form-detail-item">
+                    <span class="contact-form-detail-label">Дата изменения статуса:</span>
+                    <span class="contact-form-detail-value" id="modal-form-updated"></span>
+                </div>
+                <div class="contact-form-detail-item" id="modal-form-completed" style="display: none;">
+                    <span class="contact-form-detail-label">Дата завершения:</span>
+                    <span class="contact-form-detail-value" id="modal-form-completed-date"></span>
+                </div>
+            </div>
+            <div class="contact-form-status-change">
+                <form method="post" id="contactFormStatusForm" action="{% url 'profile' %}{% if status_filter %}?status_filter={{ status_filter }}{% endif %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="update_contact_form_status">
+                    <input type="hidden" name="form_id" id="modal-form-id">
+                    <div class="form-group">
+                        <label for="modal-status-select" class="form-label">Изменить статус:</label>
+                        <select name="status" id="modal-status-select" class="form-control">
+                            <option value="not_processed">Не обработана</option>
+                            <option value="in_progress">В обработке</option>
+                            <option value="reviewed">Рассмотрена</option>
+                        </select>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                        <button type="button" class="btn btn-secondary modal-close-btn">Закрыть</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if user.is_superuser %}
+{% load static %}
+<script src="{% static 'js/contact-forms-modal.js' %}"></script>
+{% endif %}
 {% endblock %}
 
