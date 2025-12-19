@@ -45,6 +45,7 @@
                     </div>
                 </div>
 
+                {% if not user.is_superuser %}
                 <div class="detail-section-card profile-olympiads-card">
                 <h2 class="section-title">Мои олимпиады</h2>
                 {% if registrations %}
@@ -83,6 +84,41 @@
                 </div>
                 {% endif %}
                 </div>
+                {% endif %}
+
+                {% if user.is_superuser and all_users %}
+                <div class="detail-section-card profile-olympiads-card">
+                    <h2 class="section-title">Назначение роли пользователям</h2>
+                    <div class="users-role-management">
+                        <div class="users-list">
+                            {% for target_user in all_users %}
+                            <div class="user-role-item">
+                                <div class="user-role-info">
+                                    <div class="user-role-name">
+                                        <strong>{{ target_user.get_full_name|default:target_user.username }}</strong>
+                                        <span class="user-role-username">({{ target_user.username }})</span>
+                                    </div>
+                                    <div class="user-role-current">
+                                        <span class="profile-role profile-role-{% if target_user.is_superuser %}admin{% elif target_user.is_staff %}curator{% else %}student{% endif %}">
+                                            {% if target_user.is_superuser %}Администратор{% elif target_user.is_staff %}Куратор{% else %}Студент{% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                                <form method="post" class="user-role-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="user_id" value="{{ target_user.id }}">
+                                    <select name="role" class="role-select" onchange="this.form.submit()">
+                                        <option value="student" {% if not target_user.is_superuser and not target_user.is_staff %}selected{% endif %}>Студент</option>
+                                        <option value="curator" {% if target_user.is_staff and not target_user.is_superuser %}selected{% endif %}>Куратор</option>
+                                        <option value="admin" {% if target_user.is_superuser %}selected{% endif %}>Администратор</option>
+                                    </select>
+                                </form>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </section>
     </div>

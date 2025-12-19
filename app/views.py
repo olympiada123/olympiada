@@ -259,9 +259,10 @@ def logout_view(request):
 def profile_view(request):
     """
     Отображает страницу личного кабинета пользователя.
+    Для администраторов также отображает блок назначения ролей.
     
     Args:
-        request: HTTP запрос.
+        request: HTTP запрос. Может содержать POST данные для изменения ролей пользователей.
     
     Returns:
         HttpResponse: Рендеринг шаблона profile.html с данными пользователя.
@@ -275,12 +276,47 @@ def profile_view(request):
     else:
         role = 'Студент'
     
+    if request.method == 'POST' and user.is_superuser:
+        target_user_id = request.POST.get('user_id')
+        new_role = request.POST.get('role')
+        
+        if target_user_id and new_role:
+            try:
+                target_user = CustomUser.objects.get(id=target_user_id)
+                
+                if target_user.id == user.id:
+                    messages.error(request, 'Вы не можете изменить свою собственную роль.')
+                else:
+                    if new_role == 'admin':
+                        target_user.is_superuser = True
+                        target_user.is_staff = True
+                    elif new_role == 'curator':
+                        target_user.is_superuser = False
+                        target_user.is_staff = True
+                    elif new_role == 'student':
+                        target_user.is_superuser = False
+                        target_user.is_staff = False
+                    
+                    target_user.save()
+                    messages.success(request, f'Роль пользователя {target_user.username} успешно изменена.')
+            except CustomUser.DoesNotExist:
+                messages.error(request, 'Пользователь не найден.')
+            except Exception as e:
+                messages.error(request, f'Ошибка при изменении роли: {str(e)}')
+        
+        return redirect('profile')
+    
     registrations = StudentRegistration.objects.filter(student=user).select_related('olympiad').prefetch_related('subjects', 'olympiad__subjects__subject').order_by('-registered_at')
+    
+    all_users = None
+    if user.is_superuser:
+        all_users = CustomUser.objects.all().order_by('last_name', 'first_name', 'username')
     
     context = {
         'user': user,
         'role': role,
         'registrations': registrations,
+        'all_users': all_users,
     }
     
     return render(request, 'profile.html', context)

@@ -3073,6 +3073,109 @@ textarea.form-control {
     margin-bottom: 1.5rem;
 }
 
+.users-role-management {
+    width: 100%;
+}
+
+.users-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.user-role-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    transition: var(--transition);
+}
+
+.user-role-item:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--primary-color);
+}
+
+.user-role-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.user-role-name {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.user-role-name strong {
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.user-role-username {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.user-role-current {
+    flex-shrink: 0;
+}
+
+.user-role-form {
+    flex-shrink: 0;
+}
+
+.role-select {
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+    border: 2px solid var(--border-color);
+    border-radius: 0.5rem;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: var(--transition);
+    min-width: 150px;
+}
+
+.role-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(75, 85, 99, 0.1);
+}
+
+.role-select:hover {
+    border-color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+    .user-role-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .user-role-info {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .role-select {
+        width: 100%;
+        min-width: auto;
+    }
+}
+
 @media (max-width: 768px) {
     .auth-card {
         padding: 1.5rem;
