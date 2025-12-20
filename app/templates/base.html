@@ -19,11 +19,11 @@
             </div>
             <div class="nav-menu" id="navMenu">
                 <a href="{% url 'about' %}" class="nav-link">О платформе</a>
-                <a href="{% url 'contacts' %}" class="nav-link">Контакты</a>
-                <a href="{% url 'faq' %}" class="nav-link">FAQ</a>
-                <a href="{% url 'rules' %}" class="nav-link">Правила</a>
-                <a href="{% url 'contact_form' %}" class="nav-link">Обратная связь</a>
                 <a href="{% url 'olympiads' %}" class="nav-link">Олимпиады</a>
+                <a href="{% url 'rules' %}" class="nav-link">Правила</a>
+                <a href="{% url 'faq' %}" class="nav-link">FAQ</a>
+                <a href="{% url 'contacts' %}" class="nav-link">Контакты</a>
+                <a href="{% url 'contact_form' %}" class="nav-link">Обратная связь</a>
                 {% if user.is_authenticated %}
                     <div class="user-dropdown">
                         <button class="user-dropdown-toggle" id="userDropdownToggle">
@@ -108,9 +108,9 @@
                     <div class="footer-column">
                         <h4 class="footer-title">Контакты</h4>
                         <ul class="footer-list">
-                            <li>Email: olympiada@example.com</li>
-                            <li>Телефон: +7 (495) 123-45-67</li>
-                            <li>Адрес: Москва, ул. Примерная, д. 1</li>
+                            <li>info@muiv.ru</li>
+                            <li>+7 (495) 123-45-67</li>
+                            <li>2-й Кожуховский проезд, д. 12, стр. 1</li>
                         </ul>
                     </div>
                 </div>
