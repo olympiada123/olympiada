@@ -66,6 +66,40 @@
             </div>
             {% endif %}
 
+            {% if top_students %}
+            <div class="detail-section-card">
+                <h2 class="section-title">Рейтинг студентов</h2>
+                <div class="ranking-list">
+                    {% for result in top_students %}
+                    <div class="ranking-item">
+                        <div class="ranking-position">
+                            {% if forloop.counter == 1 %}
+                                <span class="ranking-medal ranking-gold">🥇</span>
+                            {% elif forloop.counter == 2 %}
+                                <span class="ranking-medal ranking-silver">🥈</span>
+                            {% elif forloop.counter == 3 %}
+                                <span class="ranking-medal ranking-bronze">🥉</span>
+                            {% else %}
+                                <span class="ranking-number">{{ forloop.counter }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="ranking-student-info">
+                            <span class="ranking-student-name">{{ result.student.get_full_name|default:result.student.username }}</span>
+                            {% if result.student.student_id %}
+                            <span class="ranking-student-id">ID: {{ result.student.student_id }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="ranking-score">
+                            <span class="ranking-score-value">{{ result.total_score }}</span>
+                            <span class="ranking-score-max">/ {{ result.max_possible_score }}</span>
+                            <span class="ranking-score-percentage">({{ result.percentage }}%)</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
             <div class="detail-section-card detail-actions-card">
                 <div class="olympiad-detail-actions">
                     {% if user.is_authenticated %}

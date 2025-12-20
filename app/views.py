@@ -199,6 +199,14 @@ def olympiad_detail(request, olympiad_id):
             and status != "finished"
         )
 
+    top_students = None
+    if olympiad.start_date <= now:
+        top_students = (
+            Result.objects.filter(olympiad=olympiad)
+            .select_related("student")
+            .order_by("-total_score", "completed_at")[:10]
+        )
+
     context = {
         "olympiad": olympiad,
         "status": status,
@@ -209,6 +217,7 @@ def olympiad_detail(request, olympiad_id):
         "registration": registration,
         "can_register": can_register,
         "registered_subject_ids": registered_subject_ids,
+        "top_students": top_students,
     }
 
     return render(request, "olympiad_detail.html", context)
