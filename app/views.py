@@ -607,7 +607,10 @@ def profile_view(request):
 
         status_filter = request.GET.get("status_filter", "")
         contact_forms = ContactForm.objects.all().order_by("-created_at")
-        
+
+    admin_olympiads = None
+    admin_olympiad_search = None
+    if user.is_superuser:
         admin_olympiad_search = request.GET.get("admin_olympiad_search", "").strip()
         admin_olympiads_query = Olympiad.objects.all()
         

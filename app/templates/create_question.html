@@ -2,6 +2,30 @@
 
 {% block title %}Создать вопрос - {{ olympiad.name }} - {{ subject.name }}{% endblock %}
 
+{% block breadcrumb %}
+<nav class="breadcrumb">
+    <div class="container">
+        <div class="breadcrumb-item">
+            <a href="{% url 'index' %}">Главная</a>
+        </div>
+        <span class="breadcrumb-separator">›</span>
+        <div class="breadcrumb-item">
+            <a href="{% url 'olympiads' %}">Олимпиады</a>
+        </div>
+        <span class="breadcrumb-separator">›</span>
+        <div class="breadcrumb-item">
+            <a href="{% url 'olympiad_detail' olympiad.id %}">{{ olympiad.name }}</a>
+        </div>
+        <span class="breadcrumb-separator">›</span>
+        <div class="breadcrumb-item">
+            <a href="{% url 'manage_questions' olympiad.id subject.id %}">Управление вопросами</a>
+        </div>
+        <span class="breadcrumb-separator">›</span>
+        <div class="breadcrumb-item">Создать вопрос</div>
+    </div>
+</nav>
+{% endblock %}
+
 {% block content %}
 <div class="container">
     <div class="about-page">

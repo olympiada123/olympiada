@@ -2,6 +2,22 @@
 
 {% block title %}{{ olympiad.name }} - Олимпиада{% endblock %}
 
+{% block breadcrumb %}
+<nav class="breadcrumb">
+    <div class="container">
+        <div class="breadcrumb-item">
+            <a href="{% url 'index' %}">Главная</a>
+        </div>
+        <span class="breadcrumb-separator">›</span>
+        <div class="breadcrumb-item">
+            <a href="{% url 'olympiads' %}">Олимпиады</a>
+        </div>
+        <span class="breadcrumb-separator">›</span>
+        <div class="breadcrumb-item">{{ olympiad.name }}</div>
+    </div>
+</nav>
+{% endblock %}
+
 {% block content %}
 <div class="container">
     <div class="about-page">
