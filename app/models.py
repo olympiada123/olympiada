@@ -254,10 +254,12 @@ class Question(models.Model):
         """
         Рассчитать баллы на основе выбранных ответов
         """
+        from decimal import Decimal
+        
         if not selected_answers:
             return self.min_points
 
-        total_weight = 0
+        total_weight = Decimal('0')
         for answer in selected_answers:
             total_weight += answer.correctness_weight
 
@@ -268,9 +270,9 @@ class Question(models.Model):
             if max_possible_weight > 0:
                 score = self.max_points * (total_weight / max_possible_weight)
             else:
-                score = 0
+                score = Decimal('0')
         elif self.scoring_method == "threshold":
-            threshold = self.answer_combination_rules.get("threshold", 0.8)
+            threshold = Decimal(str(self.answer_combination_rules.get("threshold", 0.8)))
             if total_weight >= threshold:
                 score = self.max_points
             else:
@@ -280,7 +282,7 @@ class Question(models.Model):
         else:
             score = self.base_points * total_weight
 
-        penalty = 0
+        penalty = Decimal('0')
         for answer in selected_answers:
             if answer.correctness_weight < 0:
                 penalty += abs(answer.penalty_weight)
@@ -292,8 +294,10 @@ class Question(models.Model):
         """
         Комбинаторная оценка с учетом правил комбинаций
         """
+        from decimal import Decimal
+        
         base_score = self.base_points
-        combination_bonus = 0
+        combination_bonus = Decimal('0')
 
         selected_ids = [str(a.id) for a in selected_answers]
         rules = self.answer_combination_rules
@@ -302,7 +306,7 @@ class Question(models.Model):
             for combo in rules["combinations"]:
                 combo_answers = combo.get("answers", [])
                 if set(selected_ids) == set(combo_answers):
-                    combination_bonus = combo.get("bonus", 0)
+                    combination_bonus = Decimal(str(combo.get("bonus", 0)))
                     break
 
         total_weight = sum(a.correctness_weight for a in selected_answers)
@@ -399,6 +403,8 @@ class Answer(models.Model):
         """
         Получить эффективный вес с учетом зависимостей
         """
+        from decimal import Decimal
+        
         base_weight = self.correctness_weight
 
         if context_answers:
@@ -407,7 +413,7 @@ class Answer(models.Model):
                 required_ids = {a.id for a in required}
                 context_ids = {a.id for a in context_answers}
                 if not required_ids.issubset(context_ids):
-                    return 0.0
+                    return Decimal('0.0')
 
             conflicts = self.conflicts_with_answers.all()
             if conflicts:
@@ -416,7 +422,7 @@ class Answer(models.Model):
                 if conflict_ids.intersection(context_ids):
                     return -abs(self.penalty_weight)
 
-        return base_weight * float(self.difficulty_modifier)
+        return base_weight * Decimal(str(self.difficulty_modifier))
 
 
 class StudentRegistration(models.Model):
@@ -797,11 +803,13 @@ class StudentAnswer(models.Model):
         """
         Метод для проверки правильности ответа
         """
+        from decimal import Decimal
+        
         selected_answers = self.selected_answers.all()
 
         if not selected_answers:
             self.is_correct = False
-            self.points_earned = 0
+            self.points_earned = Decimal('0')
             self.save()
             return False
 
@@ -812,9 +820,9 @@ class StudentAnswer(models.Model):
             answer.get_effective_weight(selected_answers) for answer in selected_answers
         )
 
-        if total_weight >= 0.8:
+        if total_weight >= Decimal('0.8'):
             self.is_correct = True
-        elif total_weight >= 0.3:
+        elif total_weight >= Decimal('0.3'):
             self.is_correct = False
         else:
             self.is_correct = False
