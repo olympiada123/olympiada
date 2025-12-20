@@ -7,101 +7,15 @@
     <div class="about-page">
         <div class="olympiad-detail-header">
             <a href="{% url 'olympiads' %}" class="back-link">← Назад к олимпиадам</a>
-            <h1 class="about-page-title">{{ olympiad.name }}</h1>
-            <span class="olympiad-status olympiad-status-{{ status }}">{{ status_display }}</span>
-            {% if olympiad.description %}
-            <p class="olympiad-description-text">{{ olympiad.description }}</p>
-            {% endif %}
-        </div>
-
-        <section class="about-section">
-
-            <div class="detail-section-card">
-                <h2 class="section-title">Информация об олимпиаде</h2>
-                <div class="olympiad-details-grid">
-                    <div class="olympiad-detail-card">
-                        <div class="detail-card-icon">📅</div>
-                        <div class="detail-card-content">
-                            <h3 class="detail-card-title">Дата проведения</h3>
-                            <p class="detail-card-value">{{ olympiad.start_date|date:"d.m.Y" }} - {{ olympiad.end_date|date:"d.m.Y" }}</p>
-                        </div>
-                    </div>
-
-                    <div class="olympiad-detail-card">
-                        <div class="detail-card-icon">📝</div>
-                        <div class="detail-card-content">
-                            <h3 class="detail-card-title">Регистрация</h3>
-                            <p class="detail-card-value">{{ olympiad.registration_start|date:"d.m.Y" }} - {{ olympiad.registration_end|date:"d.m.Y" }}</p>
-                        </div>
-                    </div>
-
-                    <div class="olympiad-detail-card">
-                        <div class="detail-card-icon">📚</div>
-                        <div class="detail-card-content">
-                            <h3 class="detail-card-title">Максимум предметов</h3>
-                            <p class="detail-card-value">{{ olympiad.max_subjects_per_student }}</p>
-                        </div>
-                    </div>
+            <div class="olympiad-header-content">
+                <div class="olympiad-header-info">
+                    <h1 class="about-page-title">{{ olympiad.name }}</h1>
+                    <span class="olympiad-status olympiad-status-{{ status }}">{{ status_display }}</span>
+                    {% if olympiad.description %}
+                    <p class="olympiad-description-text">{{ olympiad.description }}</p>
+                    {% endif %}
                 </div>
-            </div>
-
-            {% if subjects %}
-            <div class="detail-section-card">
-                <h2 class="section-title">Предметы олимпиады</h2>
-                <div class="subjects-list">
-                    {% for subject in subjects %}
-                    <div class="subject-card">
-                        <span class="subject-icon">📖</span>
-                        <span class="subject-name">{{ subject.name }}</span>
-                        {% if user.is_authenticated %}
-                            {% if user.is_staff or user.is_superuser %}
-                                <a href="{% url 'manage_questions' olympiad.id subject.id %}" class="btn btn-secondary btn-sm" style="margin-left: auto;">Управление вопросами</a>
-                            {% elif is_registered and subject.id in registered_subject_ids %}
-                                <a href="{% url 'start_exam' olympiad.id subject.id %}" class="btn btn-primary btn-sm" style="margin-left: auto;">Начать тест</a>
-                            {% endif %}
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-
-            {% if top_students %}
-            <div class="detail-section-card">
-                <h2 class="section-title">Рейтинг студентов</h2>
-                <div class="ranking-list">
-                    {% for result in top_students %}
-                    <div class="ranking-item">
-                        <div class="ranking-position">
-                            {% if forloop.counter == 1 %}
-                                <span class="ranking-medal ranking-gold">🥇</span>
-                            {% elif forloop.counter == 2 %}
-                                <span class="ranking-medal ranking-silver">🥈</span>
-                            {% elif forloop.counter == 3 %}
-                                <span class="ranking-medal ranking-bronze">🥉</span>
-                            {% else %}
-                                <span class="ranking-number">{{ forloop.counter }}</span>
-                            {% endif %}
-                        </div>
-                        <div class="ranking-student-info">
-                            <span class="ranking-student-name">{{ result.student.get_full_name|default:result.student.username }}</span>
-                            {% if result.student.student_id %}
-                            <span class="ranking-student-id">ID: {{ result.student.student_id }}</span>
-                            {% endif %}
-                        </div>
-                        <div class="ranking-score">
-                            <span class="ranking-score-value">{{ result.total_score }}</span>
-                            <span class="ranking-score-max">/ {{ result.max_possible_score }}</span>
-                            <span class="ranking-score-percentage">({{ result.percentage }}%)</span>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-
-            <div class="detail-section-card detail-actions-card">
-                <div class="olympiad-detail-actions">
+                <div class="olympiad-header-actions">
                     {% if user.is_authenticated %}
                         {% if is_registered %}
                             <span class="btn btn-secondary btn-large" style="cursor: default;">Вы уже зарегистрированы</span>
@@ -125,6 +39,119 @@
                     {% endif %}
                 </div>
             </div>
+        </div>
+
+        <section class="about-section">
+            <div class="olympiad-detail-grid">
+                <div class="detail-section-card">
+                    <h2 class="section-title">Информация об олимпиаде</h2>
+                    <div class="olympiad-details-grid">
+                        <div class="olympiad-detail-card">
+                            <div class="detail-card-icon">📅</div>
+                            <div class="detail-card-content">
+                                <h3 class="detail-card-title">Дата проведения</h3>
+                                <p class="detail-card-value">{{ olympiad.start_date|date:"d.m.Y" }} - {{ olympiad.end_date|date:"d.m.Y" }}</p>
+                            </div>
+                        </div>
+
+                        <div class="olympiad-detail-card">
+                            <div class="detail-card-icon">📝</div>
+                            <div class="detail-card-content">
+                                <h3 class="detail-card-title">Регистрация</h3>
+                                <p class="detail-card-value">{{ olympiad.registration_start|date:"d.m.Y" }} - {{ olympiad.registration_end|date:"d.m.Y" }}</p>
+                            </div>
+                        </div>
+
+                        <div class="olympiad-detail-card">
+                            <div class="detail-card-icon">📚</div>
+                            <div class="detail-card-content">
+                                <h3 class="detail-card-title">Максимум предметов</h3>
+                                <p class="detail-card-value">{{ olympiad.max_subjects_per_student }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if status == 'upcoming' %}
+                    {% if subjects %}
+                    <div class="detail-section-card">
+                        <h2 class="section-title">Предметы олимпиады</h2>
+                        <div class="subjects-list">
+                            {% for subject in subjects %}
+                            <div class="subject-card">
+                                <span class="subject-icon">📖</span>
+                                <span class="subject-name">{{ subject.name }}</span>
+                                {% if user.is_authenticated %}
+                                    {% if user.is_staff or user.is_superuser %}
+                                        <a href="{% url 'manage_questions' olympiad.id subject.id %}" class="btn btn-secondary btn-sm" style="margin-left: auto;">Управление вопросами</a>
+                                    {% elif is_registered and subject.id in registered_subject_ids %}
+                                        <a href="{% url 'start_exam' olympiad.id subject.id %}" class="btn btn-primary btn-sm" style="margin-left: auto;">Начать тест</a>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    {% if top_students %}
+                    <div class="detail-section-card">
+                        <h2 class="section-title">Рейтинг студентов</h2>
+                        <div class="ranking-list ranking-list-columns">
+                            {% for result in top_students %}
+                            <div class="ranking-item ranking-item-compact">
+                                <div class="ranking-position">
+                                    {% if forloop.counter == 1 %}
+                                        <span class="ranking-medal ranking-gold">🥇</span>
+                                    {% elif forloop.counter == 2 %}
+                                        <span class="ranking-medal ranking-silver">🥈</span>
+                                    {% elif forloop.counter == 3 %}
+                                        <span class="ranking-medal ranking-bronze">🥉</span>
+                                    {% else %}
+                                        <span class="ranking-number">{{ forloop.counter }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="ranking-student-info">
+                                    <span class="ranking-student-name">{{ result.student.get_full_name|default:result.student.username }}</span>
+                                </div>
+                                <div class="ranking-score">
+                                    <span class="ranking-score-value">{{ result.total_score }}</span>
+                                    <span class="ranking-score-max">/ {{ result.max_possible_score }}</span>
+                                    <span class="ranking-score-percentage">({{ result.percentage }}%)</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="detail-section-card">
+                        <h2 class="section-title">Рейтинг студентов</h2>
+                        <p class="ranking-empty">Рейтинг будет доступен после начала олимпиады</p>
+                    </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+
+            {% if status != 'upcoming' and subjects %}
+            <div class="detail-section-card">
+                <h2 class="section-title">Предметы олимпиады</h2>
+                <div class="subjects-list">
+                    {% for subject in subjects %}
+                    <div class="subject-card">
+                        <span class="subject-icon">📖</span>
+                        <span class="subject-name">{{ subject.name }}</span>
+                        {% if user.is_authenticated %}
+                            {% if user.is_staff or user.is_superuser %}
+                                <a href="{% url 'manage_questions' olympiad.id subject.id %}" class="btn btn-secondary btn-sm" style="margin-left: auto;">Управление вопросами</a>
+                            {% elif is_registered and subject.id in registered_subject_ids %}
+                                <a href="{% url 'start_exam' olympiad.id subject.id %}" class="btn btn-primary btn-sm" style="margin-left: auto;">Начать тест</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
         </section>
     </div>
 </div>
