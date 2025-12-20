@@ -50,7 +50,8 @@
                 <h2 class="section-title">Мои олимпиады</h2>
                 {% if registrations %}
                 <div class="registrations-list">
-                    {% for registration in registrations %}
+                    {% for reg_data in registrations %}
+                    {% with registration=reg_data.registration result=reg_data.result rank=reg_data.rank %}
                     <div class="registration-card">
                         <div class="registration-header">
                             <h3 class="registration-title">
@@ -59,19 +60,36 @@
                                 </a>
                             </h3>
                         </div>
-                        <div class="registration-details">
-                            <div class="registration-detail-item">
-                                <span class="detail-icon">📅</span>
-                                <span class="detail-text">Дата регистрации: {{ registration.registered_at|date:"d.m.Y" }}</span>
+                        <div class="registration-details-grid">
+                            <div class="registration-details-column">
+                                <div class="registration-detail-item">
+                                    <span class="detail-icon">📅</span>
+                                    <span class="detail-text">Дата регистрации: {{ registration.registered_at|date:"d.m.Y" }}</span>
+                                </div>
+                                {% if registration.subjects.all %}
+                                <div class="registration-detail-item">
+                                    <span class="detail-icon">📚</span>
+                                    <span class="detail-text">Предметы: {% for subject in registration.subjects.all %}{{ subject.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</span>
+                                </div>
+                                {% endif %}
                             </div>
-                            {% if registration.subjects.all %}
-                            <div class="registration-detail-item">
-                                <span class="detail-icon">📚</span>
-                                <span class="detail-text">Предметы: {% for subject in registration.subjects.all %}{{ subject.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</span>
+                            {% if result %}
+                            <div class="registration-details-column">
+                                <div class="registration-detail-item">
+                                    <span class="detail-icon">🏆</span>
+                                    <span class="detail-text">Баллы: {{ result.total_score }} / {{ result.max_possible_score }} ({{ result.percentage }}%)</span>
+                                </div>
+                                {% if rank %}
+                                <div class="registration-detail-item">
+                                    <span class="detail-icon">📊</span>
+                                    <span class="detail-text">Место в рейтинге: {{ rank }}</span>
+                                </div>
+                                {% endif %}
                             </div>
                             {% endif %}
                         </div>
                     </div>
+                    {% endwith %}
                     {% endfor %}
                 </div>
                 {% else %}

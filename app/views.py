@@ -543,6 +543,31 @@ def profile_view(request):
             .prefetch_related("subjects", "olympiad__subjects__subject")
             .order_by("-registered_at")
         )
+        
+        registrations_with_results = []
+        for registration in registrations:
+            result = Result.objects.filter(
+                student=user, olympiad=registration.olympiad
+            ).first()
+            
+            rank = None
+            if result:
+                all_results = Result.objects.filter(
+                    olympiad=registration.olympiad
+                ).order_by("-total_score", "completed_at")
+                
+                for index, r in enumerate(all_results, start=1):
+                    if r.id == result.id:
+                        rank = index
+                        break
+            
+            registrations_with_results.append({
+                "registration": registration,
+                "result": result,
+                "rank": rank,
+            })
+        
+        registrations = registrations_with_results
 
     if user.is_staff and not user.is_superuser:
         curator_search = request.GET.get("curator_search", "").strip()

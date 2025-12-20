@@ -3029,6 +3029,19 @@ label.form-checkbox span {
     gap: 0.75rem;
 }
 
+.registration-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.registration-details-column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
 .registration-detail-item {
     display: flex;
     align-items: center;
@@ -3793,6 +3806,11 @@ label.form-checkbox span {
     .registration-title {
         font-size: 1.125rem;
     }
+    
+    .registration-details-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
 }
 
 .btn-sm {
@@ -4257,5 +4275,25 @@ label.form-checkbox span {
     color: var(--text-secondary);
     padding: 2rem;
     font-style: italic;
+}
+
+.registration-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.registration-details-column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+@media (max-width: 768px) {
+    .registration-details-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
 }
 
