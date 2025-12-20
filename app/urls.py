@@ -43,4 +43,5 @@ urlpatterns = [
     path('exam/<int:session_id>/save/', views.save_answer, name='save_answer'),
     path('exam/<int:session_id>/submit/', views.submit_exam, name='submit_exam'),
     path('exam/<int:session_id>/results/', views.exam_results, name='exam_results'),
+    path('olympiads/<int:olympiad_id>/download-participants/', views.download_olympiad_participants, name='download_olympiad_participants'),
 ]

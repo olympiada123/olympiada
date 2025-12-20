@@ -6,6 +6,9 @@ from django.utils import timezone
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.http import HttpResponse
+from openpyxl import Workbook
+from openpyxl.styles import Font, Alignment, PatternFill
 from .models import (
     ContactForm,
     Olympiad,
@@ -604,6 +607,19 @@ def profile_view(request):
 
         status_filter = request.GET.get("status_filter", "")
         contact_forms = ContactForm.objects.all().order_by("-created_at")
+        
+        admin_olympiad_search = request.GET.get("admin_olympiad_search", "").strip()
+        admin_olympiads_query = Olympiad.objects.all()
+        
+        if admin_olympiad_search:
+            admin_olympiads_query = admin_olympiads_query.filter(
+                models.Q(name__icontains=admin_olympiad_search)
+                | models.Q(description__icontains=admin_olympiad_search)
+            )
+        
+        admin_olympiads = admin_olympiads_query.prefetch_related(
+            "subjects__subject"
+        ).order_by("-is_active", "-created_at")
 
     curator_search = None
     curator_status_filter = None
@@ -622,6 +638,9 @@ def profile_view(request):
         "curator_olympiads": curator_olympiads,
         "curator_search": curator_search,
         "curator_status_filter": curator_status_filter,
+        "admin_olympiads": admin_olympiads,
+        "admin_olympiad_search": admin_olympiad_search,
+        "now": timezone.now(),
     }
 
     return render(request, "profile.html", context)
@@ -1358,3 +1377,99 @@ def exam_results(request, session_id):
         "student_answers": student_answers,
     }
     return render(request, "exam_results.html", context)
+
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def download_olympiad_participants(request, olympiad_id):
+    """
+    Скачать Excel файл с данными участников олимпиады.
+    
+    Args:
+        request: HTTP запрос.
+        olympiad_id: ID олимпиады.
+    
+    Returns:
+        HttpResponse: Excel файл с данными участников.
+    """
+    olympiad = get_object_or_404(Olympiad, id=olympiad_id)
+    now = timezone.now()
+    
+    if olympiad.start_date > now:
+        messages.error(request, "Олимпиада еще не началась.")
+        return redirect("profile")
+    
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Участники"
+    
+    headers = [
+        "Имя",
+        "Фамилия",
+        "Логин",
+        "Email",
+        "Студенческий билет",
+        "Дата регистрации",
+        "Баллы",
+        "Максимальные баллы",
+        "Процент выполнения",
+        "Место в рейтинге"
+    ]
+    
+    header_fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
+    header_font = Font(bold=True, color="FFFFFF")
+    
+    for col_num, header in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col_num, value=header)
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(horizontal="center", vertical="center")
+    
+    registrations = StudentRegistration.objects.filter(
+        olympiad=olympiad
+    ).select_related("student").prefetch_related("subjects")
+    
+    all_results = Result.objects.filter(olympiad=olympiad).order_by("-total_score", "completed_at")
+    results_dict = {r.student_id: r for r in all_results}
+    rank_dict = {}
+    
+    for index, result in enumerate(all_results, start=1):
+        rank_dict[result.student_id] = index
+    
+    row_num = 2
+    for registration in registrations:
+        student = registration.student
+        result = results_dict.get(student.id)
+        
+        if result:
+            ws.cell(row=row_num, column=1, value=student.first_name or "")
+            ws.cell(row=row_num, column=2, value=student.last_name or "")
+            ws.cell(row=row_num, column=3, value=student.username)
+            ws.cell(row=row_num, column=4, value=student.email or "")
+            ws.cell(row=row_num, column=5, value=student.student_id or "")
+            ws.cell(row=row_num, column=6, value=registration.registered_at.strftime("%d.%m.%Y %H:%M"))
+            ws.cell(row=row_num, column=7, value=float(result.total_score))
+            ws.cell(row=row_num, column=8, value=float(result.max_possible_score))
+            ws.cell(row=row_num, column=9, value=float(result.percentage))
+            ws.cell(row=row_num, column=10, value=rank_dict.get(student.id, ""))
+            row_num += 1
+    
+    for col in ws.columns:
+        max_length = 0
+        column = col[0].column_letter
+        for cell in col:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except:
+                pass
+        adjusted_width = min(max_length + 2, 50)
+        ws.column_dimensions[column].width = adjusted_width
+    
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response["Content-Disposition"] = f'attachment; filename="olympiad_{olympiad.id}_participants.xlsx"'
+    
+    wb.save(response)
+    return response
